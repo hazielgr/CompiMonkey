@@ -1,0 +1,6 @@
+
+expr       :   term ((SUMA|RESTA) term)*
+
+term       :   factor ((MULTIPLICA|DIVIDE) factor)*
+
+factor      :   ENTERO|DECIMAL      : (SUMA|RESTA) factor: PARENTIZQ expr PARENTDER
