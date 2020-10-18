@@ -1,5 +1,6 @@
-from Parser import *
-from lexico import Lexico
+from parsero.Parser import *
+from interprete.interpreter import *
+from interprete.contexto import *
 
 def run(fn,txt):
     ################################################\
@@ -11,7 +12,15 @@ def run(fn,txt):
     #Parser
     parser = Parser(tokens)
     ast = parser.parse()
-    return ast.node, ast.error
+    if ast.error: return None,ast.error
+    ##################################################
+    #Interprete
+    interprete = Interpreter()
+    contexto = Context('<programa>')
+    interpre_sol= interprete.visit(ast.node,contexto)
+
+
+    return interpre_sol.value,interpre_sol.error
     ###################################################
 
 while True:

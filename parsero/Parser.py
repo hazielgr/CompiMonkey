@@ -1,6 +1,6 @@
-from lexico import *
+from lexico.lexico import *
 from errorHandler import *
-from parseResult import *
+from parsero.parseResult import *
 ####################################
 # PARSER
 ####################################
