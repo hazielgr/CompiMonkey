@@ -28,8 +28,18 @@ class Numero:
     def divided_by(self, other):
         if isinstance(other, Numero):
             if other.value == 0:
-                return None, RuntimeError(other.pos_start, other.pos_end, 'No es valida la division por cero'), self.context
+                return None, RuntimeError(other.pos_start, other.pos_end, 'No es valida la division por cero', self.context)
             return Numero(self.value / other.value).set_context(self.context), None
+
+    def powed_by(self, other):
+        if isinstance(other, Numero):
+            return Numero(self.value ** other.value).set_context(self.context), None
+
+    def copy(self):
+        copy = Numero(self.value)
+        copy.set_pos(self.pos_start, self.pos_end)
+        copy.set_context(self.context)
+        return copy
 
     def __repr__(self):
         return str(self.value)

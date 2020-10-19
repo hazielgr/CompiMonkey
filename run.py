@@ -2,6 +2,8 @@ from parsero.Parser import *
 from interprete.interpreter import *
 from interprete.contexto import *
 
+tabla_simbolos_global = tablaDeSimbolos()
+tabla_simbolos_global.set("null",Numero(0))
 def run(fn,txt):
     ################################################\
     #Analisis Tokens
@@ -17,6 +19,7 @@ def run(fn,txt):
     #Interprete
     interprete = Interpreter()
     contexto = Context('<programa>')
+    contexto.symbol_table = tabla_simbolos_global
     interpre_sol= interprete.visit(ast.node,contexto)
 
 
