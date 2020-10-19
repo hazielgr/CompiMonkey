@@ -48,6 +48,22 @@ class Interpreter:
             result, error = left.divided_by(right)
         elif node.op_token.type == T_POW:
             result, error = left.powed_by(right)
+        elif node.op_token.type == T_COMP_IGUAL:
+            result, error = left.get_comparison_equals(right)
+        elif node.op_token.type == T_COMP_NO_IGUAL:
+            result, error = left.get_comparison_notequals(right)
+        elif node.op_token.type == T_COMP_MENORQUE:
+            result, error = left.get_comparison_lowerthan(right)
+        elif node.op_token.type == T_COMP_MAYORQUE:
+            result, error = left.get_comparison_greaterthan(right)
+        elif node.op_token.type == T_COMP_MENORIGUAL:
+            result, error = left.get_comparison_lowerequal(right)
+        elif node.op_token.type == T_COMP_MAYORIGUAL:
+            result, error = left.get_comparison_greaterequal(right)
+        elif node.op_token.matches(T_KEYWORD, 'and'):
+            result, error = left.anded_by(right)
+        elif node.op_token.matches(T_KEYWORD, 'or'):
+            result, error = left.ored_by(right)
         if error:
             return  res.failure(error)
         else:

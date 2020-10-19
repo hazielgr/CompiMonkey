@@ -70,6 +70,28 @@ class Parser:
 
     def term(self):
         return self.bin_operation(self.factor,(T_MULTIPLICA,T_DIVIDE))
+
+    def arith_expr(self):
+        return self.bin_operation(self.term, (T_SUMA, T_RESTA))
+
+    def comp_expr(self):
+        res = ParseResult()
+
+        if self.current_token.matches(T_KEYWORD, 'not'):
+            op_token = self.current_token
+            res.register_move()
+            self.move()
+
+            node = res.register(self.comp_expr())
+            if res.error: return res
+            return res.success(UnaryOpNode(op_token, node))
+
+        node = res.register(self.bin_operation(self.arith_expr, (T_COMP_IGUAL, T_COMP_NO_IGUAL, T_COMP_MENORQUE, T_COMP_MAYORQUE, T_COMP_MENORIGUAL, T_COMP_MAYORIGUAL)))
+
+        if res.error:
+            return res.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,"Expected int, float, identifier, '+', '-', '(' or 'not'"))
+        return res.success(node)
+
     def expr(self):
         res = ParseResult()
         # if self.current_token.matches(T_KEYWORD,'VAR'):
@@ -91,7 +113,7 @@ class Parser:
             if res.error: return res
             return res.success(varAssignNode(var_name, expr))
 
-        node = res.register(self.bin_operation(self.term, (T_SUMA, T_RESTA)))
+        node = res.register(self.bin_operation(self.comp_expr, ((T_KEYWORD,"and"),(T_KEYWORD,'or'))))
 
         if res.error:
             return res.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,"Expected int, float, identifier, '+', '-' or '('"))
@@ -104,7 +126,7 @@ class Parser:
         left = res.register(func_a())
         if res.error: return res
 
-        while self.current_token.type in ops:
+        while self.current_token.type in ops or (self.current_token.type, self.current_token.value) in ops:
             op_token = self.current_token
             res.register_move()
             self.move()

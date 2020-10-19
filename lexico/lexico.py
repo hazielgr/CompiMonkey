@@ -44,10 +44,15 @@ T_IDENTIFICADOR=       'IDENTIFICADOR'
 T_IGUAL        =       'EQ'
 T_KEYWORD      =       'KEYWORD'
 T_POW		   =       'POW'
-
+T_COMP_IGUAL  =        'COMP_EQUAL'
+T_COMP_NO_IGUAL=       'COMP_NOT_EQUAL'
+T_COMP_MENORQUE=       'COMP_MENORQUE'
+T_COMP_MAYORQUE=       'COMP_MAYORQUE'
+T_COMP_MENORIGUAL=     'COMP_MENORIGUAL'
+T_COMP_MAYORIGUAL=     'COMP_MAYORIGUAL'
 
 KEYWORDS = [
-    'VAR'
+    'VAR', 'and' , 'or' , 'not'
 ]
 # En esta clase token, se crean los tokens, con su tipo, su valor y se les pasa su posicion de inicio y final
 class Token:
@@ -93,9 +98,9 @@ class Lexico:
             if self.current_char in ' \t':
                 self.move()
             elif self.current_char in DIGITOS:
-                tokens.append(self.make_Number())
+                tokens.append(self.make_numero())
             elif self.current_char in LETRAS:
-                tokens.append(self.make_identifier())
+                tokens.append(self.make_identificador())
             elif self.current_char == '+':
                 tokens.append(Token(T_SUMA,pos_start=self.pos))
                 self.move()
@@ -108,9 +113,6 @@ class Lexico:
             elif self.current_char == '/':
                 tokens.append(Token(T_DIVIDE,pos_start=self.pos))
                 self.move()
-            elif self.current_char == '=':
-                tokens.append(Token(T_IGUAL,pos_start=self.pos))
-                self.move()
             elif self.current_char == '^':
                 tokens.append(Token(T_POW, pos_start=self.pos))
                 self.move()
@@ -120,6 +122,16 @@ class Lexico:
             elif self.current_char == ')':
                 tokens.append(Token(T_PARENTDER,pos_start=self.pos))
                 self.move()
+            elif self.current_char == '!':
+                token, error = self.make_no_igual()
+                if error: return [], error
+                tokens.append(token)
+            elif self.current_char == '=':
+                tokens.append(self.make_igual())
+            elif self.current_char == '<':
+                tokens.append(self.make_menor_que())
+            elif self.current_char == '>':
+                tokens.append(self.make_mayor_que())
             else:
                 pos_start= self.pos.copy()
                 character=self.current_char
@@ -129,7 +141,7 @@ class Lexico:
         tokens.append(Token(T_EOF, pos_start=self.pos))
         return tokens,None
 
-    def make_Number(self):
+    def make_numero(self):
         # mantenemos numero en formato string
         num_str = ''
         dot_count = 0
@@ -145,7 +157,7 @@ class Lexico:
         else:
             return Token(T_DECIMAL, float(num_str),pos_start,self.pos)
 
-    def make_identifier(self):
+    def make_identificador(self):
         id_string = ''
         pos_start = self.pos.copy()
 
@@ -155,6 +167,44 @@ class Lexico:
 
         token_type = T_KEYWORD if id_string in KEYWORDS else T_IDENTIFICADOR
         return Token(token_type,id_string,pos_start,self.pos)
+
+    def make_no_igual(self):
+        pos_start = self.pos.copy()
+        self.move()
+        if self.current_char == '=':
+            self.move()
+            return Token(T_COMP_NO_IGUAL, pos_start=pos_start, pos_end=self.pos), None
+        self.move()
+        return None, ExpectedCharacError(pos_start, self.pos, "'=' (after '!')")
+
+    def make_igual(self):
+        token_type = T_IGUAL
+        pos_start = self.pos.copy()
+        self.move()
+        if self.current_char == '=':
+            self.move()
+            token_type = T_COMP_IGUAL
+        return Token(token_type, pos_start=pos_start, pos_end=self.pos)
+
+    def make_menor_que(self):
+        token_type = T_COMP_MENORQUE
+        pos_start = self.pos.copy()
+        self.move()
+        if self.current_char == '=':
+            self.move()
+            token_type = T_COMP_MENORIGUAL
+
+        return Token(token_type, pos_start=pos_start, pos_end=self.pos)
+
+    def make_mayor_que(self):
+        token_type = T_COMP_MAYORQUE
+        pos_start = self.pos.copy()
+        self.move()
+        if self.current_char == '=':
+            self.move()
+            token_type = T_COMP_MAYORIGUAL
+
+        return Token(token_type, pos_start=pos_start, pos_end=self.pos)
 
 
 ######################

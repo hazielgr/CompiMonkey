@@ -35,6 +35,41 @@ class Numero:
         if isinstance(other, Numero):
             return Numero(self.value ** other.value).set_context(self.context), None
 
+    def get_comparison_equals(self, other):
+        if isinstance(other, Numero):
+            return Numero(int(self.value == other.value)).set_context(self.context), None
+
+    def get_comparison_notequals(self, other):
+        if isinstance(other, Numero):
+            return Numero(int(self.value != other.value)).set_context(self.context), None
+
+    def get_comparison_lowerthan(self, other):
+        if isinstance(other, Numero):
+            return Numero(int(self.value < other.value)).set_context(self.context), None
+
+    def get_comparison_greaterthan(self, other):
+        if isinstance(other, Numero):
+            return Numero(int(self.value > other.value)).set_context(self.context), None
+
+    def get_comparison_lowerequal(self, other):
+        if isinstance(other, Numero):
+            return Numero(int(self.value <= other.value)).set_context(self.context), None
+
+    def get_comparison_greaterequal(self, other):
+        if isinstance(other, Numero):
+            return Numero(int(self.value >= other.value)).set_context(self.context), None
+
+    def anded_by(self, other):
+        if isinstance(other, Numero):
+            return Numero(int(self.value and other.value)).set_context(self.context), None
+
+    def ored_by(self, other):
+        if isinstance(other, Numero):
+            return Numero(int(self.value or other.value)).set_context(self.context), None
+
+    def notted(self):
+        return Number(1 if self.value == 0 else 0).set_context(self.context), None
+
     def copy(self):
         copy = Numero(self.value)
         copy.set_pos(self.pos_start, self.pos_end)

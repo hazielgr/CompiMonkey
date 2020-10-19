@@ -1,9 +1,13 @@
 from parsero.Parser import *
 from interprete.interpreter import *
 from interprete.contexto import *
+from interprete.tablaDeSimbolos import *
 
 tabla_simbolos_global = tablaDeSimbolos()
 tabla_simbolos_global.set("null",Numero(0))
+tabla_simbolos_global.set("no",Numero(0))
+tabla_simbolos_global.set("si",Numero(1))
+
 def run(fn,txt):
     ################################################\
     #Analisis Tokens
