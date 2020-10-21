@@ -49,6 +49,7 @@ buttony = 850
 def main():
     global FPSCLOCK
     lvlActors = []
+    grid = []
     changelvl = 0
     currentlvl = 0
     pygame.init()
@@ -117,14 +118,13 @@ def main():
 
         buttons = [lvl1_button, lvl2_button, lvl3_button, lvl4_button, lvl5_button, lvl6_button]
 
-
-
         # level manager
         if currentlvl != changelvl:
             lvlActors = levelManager(changelvl)
             currentlvl = changelvl
+            
 
-        blitLevel(lvlActors, displaySurf, currentlvl)
+        blitLevel(lvlActors, displaySurf, grid)
 
         # dibuja los botones
         for i in range(len(buttons)):
@@ -364,11 +364,11 @@ def checkCollision(lvlActors):
                     lvlActors[1].pop(banana)
 
 
-def blitLevel(lvlActors, displaySurf, currentlvl):
+def blitLevel(lvlActors, displaySurf, grid):
     if len(lvlActors) != 0:
         # Dibujando la superficie del nivel
         mapsurface = lvlActors[8:]
-        print(mapsurface[0])
+
         for i in range(len(mapsurface)):
             pygame.draw.rect(displaySurf, mapsurface[i][0], mapsurface[i][1])
 
@@ -382,9 +382,31 @@ def blitLevel(lvlActors, displaySurf, currentlvl):
             displaySurf.blit(lvlActors[1][banana].sprite, (lvlActors[1][banana].posx, lvlActors[1][banana].posy))
             pygame.draw.rect(displaySurf, BLACK, lvlActors[1][banana].hitbox, 2)
 
-    # le hace blit a todas las string en maiList al surface object
+        # grid
+        counterx = 0
+        countery = 0
+        height = 50
+        width = 50
+        posx = 0
+        posy = 0
 
 
+
+        while counterx < 16:
+            while countery < 18:
+                rect = (posx, posy, width, height)
+                grid += [rect]
+                pygame.draw.rect(displaySurf, WHITE, rect, 1)
+                countery += 1
+                posy += 50
+            posy = 0
+            posx += 50
+            countery = 0
+            counterx += 1
+
+
+
+# le hace blit a todas las string en mainList al surface object
 def blitAll(mainList, mainFont, camerax, cameray, cursorRect, displaySurf):
     displaySurf.fill(BGCOLOR)
     i = 0
