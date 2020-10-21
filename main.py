@@ -1,5 +1,8 @@
 import pygame, sys, math
 from pygame.locals import *
+from levels import level1
+from lvlManager import *
+from button import *
 
 ## CONSTANTES ##
 
@@ -17,11 +20,11 @@ DOWN = 'down'
 ## COLORES ##
 
 #            R    G    B
-GRAY = (68,68,68)
+GRAY = (68, 68, 68)
 NAVYBLUE = (60, 60, 100)
-WHITE = (190,190,190)
+WHITE = (255, 255, 255)
 RED = (255, 0, 0)
-GREEN = (41,171,13)
+GREEN = (41, 171, 13)
 BLUE = (0, 0, 255)
 YELLOW = (255, 255, 0)
 ORANGE = (255, 128, 0)
@@ -29,40 +32,58 @@ PURPLE = (255, 0, 255)
 CYAN = (0, 255, 255)
 BLACK = (0, 0, 0)
 COMBLUE = (233, 232, 255)
-
+CREAM = (248, 242, 218)
+DARKCREAM = (255, 242, 180)
 BGCOLOR = GRAY
 TEXTCOLOR = WHITE
+
+icon = pygame.image.load('resources/sprites/monkey_head_icon.png')
+monkeyhead_sprite = pygame.image.load('resources/sprites/monkey_head_icon.png')
+banana_sprite = pygame.image.load('resources/sprites/jungle_banana_icon.png')
+
+buttons = []
+buttonx = 0
+buttony = 850
 
 
 def main():
     global FPSCLOCK
+    lvlActors = []
+    changelvl = 0
+    currentlvl = 0
     pygame.init()
     FPSCLOCK = pygame.time.Clock()
+    running = True
 
     windowWidth = 1600
     windowHeight = 900
+    displaySurf = pygame.display.set_mode((windowWidth, windowHeight), RESIZABLE)
+
     lineNumber = 0
     newChar = ''
     typeChar = False
     textString = ''
-    mainList = [] # Contiene cada linea que se escribio en strings separados por linea dentro de la lista
+
+    mainList = []  # Contiene cada linea que se escribio en strings separados por linea dentro de la lista
     mainList.append(textString)
-    deleteKey = False # booleano que revisa si se quiere borrar
-    returnKey = False # booleano que revisa si se quiere cambiar de linea
+    deleteKey = False  # booleano que revisa si se quiere borrar
+    returnKey = False  # booleano que revisa si se quiere cambiar de linea
+
     insertPoint = 0
     camerax = 0
     cameray = 0
+
     mouseClicked = False
     mouseX = 0
     mouseY = 0
 
-    displaySurf = pygame.display.set_mode((windowWidth, windowHeight), RESIZABLE)
-    #displaySurf.fill(BGCOLOR)
-
+    # displaySurf.fill(BGCOLOR)
 
     pygame.display.update()
 
     pygame.display.set_caption('CompiMonkey')
+    pygame.display.set_icon(icon)
+
     mainFont = pygame.font.SysFont('Lucida Console', TEXTHEIGHT)
 
     cursorRect = getCursorRect(STARTX, STARTY + (TEXTHEIGHT + (TEXTHEIGHT / 4)), mainFont, camerax, cameray)
@@ -70,15 +91,13 @@ def main():
     # El loop del juego detecta el input del usuario y lo muestra en pantalla
     # coloca el cursor en la pantalla y ajusta la camara de ser necesario
 
-    while True:
+    while running:
 
         camerax, cameray = adjustCamera(mainList, lineNumber, insertPoint, cursorRect, mainFont, camerax, cameray,
                                         windowWidth, windowHeight)
 
         newChar, typeChar, deleteKey, returnKey, directionKey, windowWidth, windowHeight, mouseX, mouseY, mouseClicked = getInput(
             windowWidth, windowHeight)
-
-
 
         mainList, lineNumber, insertPoint, cursorRect = displayText(mainFont, newChar, typeChar, mainList, deleteKey,
                                                                     returnKey, lineNumber, insertPoint, directionKey,
@@ -88,6 +107,41 @@ def main():
 
         displayInfo(insertPoint, mainFont, cursorRect, camerax, windowWidth, windowHeight, displaySurf)
         pygame.draw.rect(displaySurf, GREEN, (0, 0, 800, 900))
+
+        # buttons
+        lvl1_button = Button(1, CREAM, buttonx, buttony, 100, 50, "lvl1")
+        lvl2_button = Button(2, CREAM, buttonx + 110, buttony, 100, 50, "lvl2")
+        lvl3_button = Button(3, CREAM, buttonx + 220, buttony, 100, 50, "lvl3")
+
+        buttons = [lvl1_button, lvl2_button, lvl3_button]
+
+        # dibuja los botones
+        for i in range(len(buttons)):
+            buttons[i].draw(displaySurf)
+
+        # revisa si el mouse fue clickeado
+        for event in pygame.event.get():
+            mousePos = pygame.mouse.get_pos()
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                for i in range(len(buttons)):
+                    if buttons[i].isOver(mousePos):
+                        changelvl = buttons[i].lvl
+
+        # level manager
+        if currentlvl != changelvl:
+            lvlActors = levelManager(changelvl)
+            currentlvl = changelvl
+
+        blitLevel(lvlActors, displaySurf)
+        checkCollision(lvlActors)
+
+        #mov mono
+        if len(lvlActors) != 0:
+            lvlActors[0].posy += 1
+
+
+        score(displaySurf, lvlActors)
         pygame.display.update()
         FPSCLOCK.tick(FPS)
 
@@ -282,10 +336,40 @@ def displayText(mainFont, newChar, typeChar, mainList, deleteKey, returnKey, lin
     return mainList, lineNumber, insertPoint, cursorRect
 
 
+def score(displaySurf, lvlActors):
+    banana_aux = pygame.transform.scale(banana_sprite, (92, 64))
+
+    displaySurf.blit(banana_aux, (0, 0))
+    scoreFont = pygame.font.SysFont('Lucida Console', 60)
+    if len(lvlActors) != 0:
+        text = scoreFont.render("x" + str(lvlActors[2]), True, WHITE)
+    else:
+        text = scoreFont.render("x" + str(0), True, WHITE)
+    displaySurf.blit(text, (100, 7))
+
+
+def checkCollision(lvlActors):
+    if len(lvlActors) != 0:
+        monkey = lvlActors[0]
+        for banana in range(len(lvlActors[1])):
+            if monkey.posy < lvlActors[1][banana].hitbox[1] + lvlActors[1][banana].hitbox[3] and monkey.posy + monkey.hitbox[3] > lvlActors[1][banana].hitbox[1]:
+                if monkey.posx + monkey.hitbox[2] > lvlActors[1][banana].hitbox[0] and monkey.posx < lvlActors[1][banana].hitbox[0] + lvlActors[1][banana].hitbox[2]:
+                    lvlActors[2] += 1
+                    lvlActors[1].pop(banana)
 
 
 
-    #le hace blit a todsa las string en maiList al surface object
+def blitLevel(lvlActors, displaySurf):
+    if len(lvlActors) != 0:
+        displaySurf.blit(lvlActors[0].sprite, (lvlActors[0].posx, lvlActors[0].posy))
+        pygame.draw.rect(displaySurf, BLACK, lvlActors[0].hitbox, 2)
+        lvlActors[0].hitbox = (lvlActors[0].posx + 11, lvlActors[0].posy + 35, 375, 305)
+        for banana in range(len(lvlActors[1])):
+            displaySurf.blit(lvlActors[1][banana].sprite, (lvlActors[1][banana].posx, lvlActors[1][banana].posy))
+            pygame.draw.rect(displaySurf, BLACK, lvlActors[1][banana].hitbox, 2)
+
+    # le hace blit a todas las string en maiList al surface object
+
 
 def blitAll(mainList, mainFont, camerax, cameray, cursorRect, displaySurf):
     displaySurf.fill(BGCOLOR)
@@ -337,6 +421,7 @@ def getInput(windowWidth, windowHeight):
     mouseX = 0
     mouseY = 0
     mouseClicked = False
+    mousePos = pygame.mouse.get_pos()
 
     for event in pygame.event.get():
         if event.type == QUIT:
@@ -381,10 +466,8 @@ def getInput(windowWidth, windowHeight):
 
     return newChar, typeChar, deleteKey, returnKey, directionKey, windowWidth, windowHeight, mouseX, mouseY, mouseClicked
 
+    # Estas funciones basicamente envuelven lo que es el cursor
 
-
-
-    #Estas funciones basicamente envuelven lo que es el cursor
 
 def getStringRect(string, lineNumber, camerax, cameray):
     stringRect = string.get_rect()
@@ -419,8 +502,7 @@ def getStringRectAtInsertPoint(mainList, lineNumber, insertPoint, mainFont, came
 
     return stringRect
 
-
-    #funciones de utilidad
+    # funciones de utilidad
 
 
 def getCursorRect(cursorX, cursorY, mainFont, camerax, cameray):
@@ -456,9 +538,6 @@ def displayInfo(insertPoint, mainFont, cursorRect, camerax, windowWidth, windowH
     windowRect.bottom = windowHeight
     windowRect.right = cameraRect.left
     displaySurf.blit(windowWidthRender, windowRect)
-
-
-
 
     # Estas tres funciones permiten colocar el cursor donde se clickea el mous
 
@@ -516,6 +595,7 @@ def getStringRenderAndRect(string, mainFont):
 
     return stringRender, stringRect
 
+
 def printmainList(mainList):
     for item in mainList[:-1]:
         print(item)
@@ -523,7 +603,3 @@ def printmainList(mainList):
 
 if __name__ == '__main__':
     main()
-
-
-
-
