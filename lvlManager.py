@@ -9,6 +9,12 @@ def levelManager(lvl):
         return level2()
     elif lvl == 3:
         return level3()
+    elif lvl == 4:
+        return level4()
+    elif lvl == 5:
+        return level5()
+    else:
+        return level6()
 
 
 

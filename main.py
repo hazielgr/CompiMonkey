@@ -19,7 +19,7 @@ DOWN = 'down'
 
 ## COLORES ##
 
-#            R    G    B
+#      R    G    B
 GRAY = (68, 68, 68)
 NAVYBLUE = (60, 60, 100)
 WHITE = (255, 255, 255)
@@ -106,14 +106,25 @@ def main():
                                                                     mouseY)
 
         displayInfo(insertPoint, mainFont, cursorRect, camerax, windowWidth, windowHeight, displaySurf)
-        pygame.draw.rect(displaySurf, GREEN, (0, 0, 800, 900))
 
         # buttons
         lvl1_button = Button(1, CREAM, buttonx, buttony, 100, 50, "lvl1")
         lvl2_button = Button(2, CREAM, buttonx + 110, buttony, 100, 50, "lvl2")
         lvl3_button = Button(3, CREAM, buttonx + 220, buttony, 100, 50, "lvl3")
+        lvl4_button = Button(4, CREAM, buttonx + 330, buttony, 100, 50, "lvl4")
+        lvl5_button = Button(5, CREAM, buttonx + 440, buttony, 100, 50, "lvl5")
+        lvl6_button = Button(6, CREAM, buttonx + 550, buttony, 100, 50, "lvl6")
 
-        buttons = [lvl1_button, lvl2_button, lvl3_button]
+        buttons = [lvl1_button, lvl2_button, lvl3_button, lvl4_button, lvl5_button, lvl6_button]
+
+
+
+        # level manager
+        if currentlvl != changelvl:
+            lvlActors = levelManager(changelvl)
+            currentlvl = changelvl
+
+        blitLevel(lvlActors, displaySurf, currentlvl)
 
         # dibuja los botones
         for i in range(len(buttons)):
@@ -128,18 +139,11 @@ def main():
                     if buttons[i].isOver(mousePos):
                         changelvl = buttons[i].lvl
 
-        # level manager
-        if currentlvl != changelvl:
-            lvlActors = levelManager(changelvl)
-            currentlvl = changelvl
-
-        blitLevel(lvlActors, displaySurf)
         checkCollision(lvlActors)
 
-        #mov mono
+        # mov mono
         if len(lvlActors) != 0:
             lvlActors[0].posy += 1
-
 
         score(displaySurf, lvlActors)
         pygame.display.update()
@@ -352,18 +356,28 @@ def checkCollision(lvlActors):
     if len(lvlActors) != 0:
         monkey = lvlActors[0]
         for banana in range(len(lvlActors[1])):
-            if monkey.posy < lvlActors[1][banana].hitbox[1] + lvlActors[1][banana].hitbox[3] and monkey.posy + monkey.hitbox[3] > lvlActors[1][banana].hitbox[1]:
-                if monkey.posx + monkey.hitbox[2] > lvlActors[1][banana].hitbox[0] and monkey.posx < lvlActors[1][banana].hitbox[0] + lvlActors[1][banana].hitbox[2]:
+            if monkey.posy < lvlActors[1][banana].hitbox[1] + lvlActors[1][banana].hitbox[3] and monkey.posy + \
+                    monkey.hitbox[3] > lvlActors[1][banana].hitbox[1]:
+                if monkey.posx + monkey.hitbox[2] > lvlActors[1][banana].hitbox[0] and monkey.posx < \
+                        lvlActors[1][banana].hitbox[0] + lvlActors[1][banana].hitbox[2]:
                     lvlActors[2] += 1
                     lvlActors[1].pop(banana)
 
 
-
-def blitLevel(lvlActors, displaySurf):
+def blitLevel(lvlActors, displaySurf, currentlvl):
     if len(lvlActors) != 0:
+        # Dibujando la superficie del nivel
+        mapsurface = lvlActors[8:]
+        print(mapsurface[0])
+        for i in range(len(mapsurface)):
+            pygame.draw.rect(displaySurf, mapsurface[i][0], mapsurface[i][1])
+
+        # monkey y su hitbox
         displaySurf.blit(lvlActors[0].sprite, (lvlActors[0].posx, lvlActors[0].posy))
         pygame.draw.rect(displaySurf, BLACK, lvlActors[0].hitbox, 2)
         lvlActors[0].hitbox = (lvlActors[0].posx + 11, lvlActors[0].posy + 35, 375, 305)
+
+        # bananas y sus hitboxes
         for banana in range(len(lvlActors[1])):
             displaySurf.blit(lvlActors[1][banana].sprite, (lvlActors[1][banana].posx, lvlActors[1][banana].posy))
             pygame.draw.rect(displaySurf, BLACK, lvlActors[1][banana].hitbox, 2)
