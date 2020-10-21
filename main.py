@@ -385,12 +385,10 @@ def blitLevel(lvlActors, displaySurf, grid):
         # grid
         counterx = 0
         countery = 0
-        height = 50
-        width = 50
+        height = 100
+        width = 100
         posx = 0
         posy = 0
-
-
 
         while counterx < 16:
             while countery < 18:
@@ -398,9 +396,9 @@ def blitLevel(lvlActors, displaySurf, grid):
                 grid += [rect]
                 pygame.draw.rect(displaySurf, WHITE, rect, 1)
                 countery += 1
-                posy += 50
+                posy += 100
             posy = 0
-            posx += 50
+            posx += 100
             countery = 0
             counterx += 1
 
