@@ -1,26 +1,30 @@
-##########################################
-# PARSE RESULT
-# La clase parseResult es para el resultado del parser
-##############################################
+##########################################################
+# Clase ParseResult: Representacion de los movientos hechos por el parser
+#########################################################
 class ParseResult:
 	def __init__(self):
 		self.error = None
 		self.node = None
+		self.last_registered_move_count = 0
 		self.move_count = 0
-
+		self.to_reverse_count = 0
 	def register_move(self):
+		self.last_registered_move_count = 1
 		self.move_count += 1
-
 	def register(self, res):
+		self.last_registered_move_count = res.move_count
 		self.move_count += res.move_count
 		if res.error: self.error = res.error
 		return res.node
-
+	def try_register(self, res):
+		if res.error:
+			self.to_reverse_count = res.move_count
+			return None
+		return self.register(res)
 	def success(self, node):
 		self.node = node
 		return self
-
 	def failure(self, error):
-		if not self.error or self.move_count == 0:
+		if not self.error or self.last_registered_move_count == 0:
 			self.error = error
 		return self
