@@ -28,8 +28,13 @@ def run(fn,txt):
     interpre_sol= interprete.visit(ast.node,contexto)
     return interpre_sol.value,interpre_sol.error
 while True:
-    txt = input('test -> ')
-    result, error = run('<stdin>', txt)
-
-    if error: print(error.as_string())
-    else: print(result)
+    text = input('input > ')
+    if text.strip() == "": continue
+    result, error = run('<stdin>', text)
+    if error:
+        print(error.as_string())
+    elif result:
+        if len(result.elements) == 1:
+            print(repr(result.elements[0]))
+        else:
+            print(repr(result))

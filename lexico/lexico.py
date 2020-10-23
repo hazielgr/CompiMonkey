@@ -1,4 +1,4 @@
-from errores.errorHandler import *
+from errores.ErrorHandler import *
 import string
 ##########################################################
 # Constantes: usadas en el analizador lexico
@@ -29,13 +29,16 @@ class Position:
 # Constantes Tokens: Creamos los tokens
 #########################################################
 T_ENTERO       =       'ENTERO'
+T_STRING       =       'STRING'
 T_DECIMAL      =       'DECIMAL'
 T_SUMA         =       'SUMA'
-T_RESTA        =       'RESTA'
+T_MENOS        =       'MENOS'
 T_MULTIPLICA   =       'MULTIPLICA'
 T_DIVIDE       =       'DIVIDE'
 T_PARENTIZQ    =       'PARENTIZQ'
 T_PARENTDER    =       'PARENTDER'
+T_RECTIZQ      =       'RECTIZQ'
+T_RECTDER      =       'RECTDER'
 T_EOF          =       'EOF'
 T_IDENTIFICADOR=       'IDENTIFICADOR'
 T_IGUAL        =       'EQ'
@@ -48,6 +51,8 @@ T_COMP_MAYORQUE=       'COMP_MAYORQUE'
 T_COMP_MENORIGUAL=     'COMP_MENORIGUAL'
 T_COMP_MAYORIGUAL=     'COMP_MAYORIGUAL'
 T_NEWLINE	   =       'NEWLINE'
+T_COMA         =       'COMA'
+T_FLECHA	   =       'FLECHA'
 
 KEYWORDS = [
     'and' , 'or' , 'not', 'if', 'else',
@@ -88,19 +93,17 @@ class Lexico:
         while self.current_char != None:
             if self.current_char in ' \t':
                 self.move()
-            elif self.current_char in '\n':
-                tokens.append(Token(T_NEWLINE, pos_start=self.pos))
-                self.move()
             elif self.current_char in DIGITOS:
                 tokens.append(self.make_numero())
             elif self.current_char in LETRAS:
                 tokens.append(self.make_identificador())
+            elif self.current_char == '"':
+                tokens.append(self.make_string())
             elif self.current_char == '+':
                 tokens.append(Token(T_SUMA,pos_start=self.pos))
                 self.move()
             elif self.current_char == '-':
-                tokens.append(Token(T_RESTA,pos_start=self.pos))
-                self.move()
+                tokens.append(self.make_minus_or_arrow())
             elif self.current_char == '*':
                 tokens.append(Token(T_MULTIPLICA,pos_start=self.pos))
                 self.move()
@@ -116,6 +119,12 @@ class Lexico:
             elif self.current_char == ')':
                 tokens.append(Token(T_PARENTDER,pos_start=self.pos))
                 self.move()
+            elif self.current_char == '[':
+                tokens.append(Token(T_RECTIZQ, pos_start=self.pos))
+                self.move()
+            elif self.current_char == ']':
+                tokens.append(Token(T_RECTDER, pos_start=self.pos))
+                self.move()
             elif self.current_char == '!':
                 token, error = self.make_no_igual()
                 if error: return [], error
@@ -126,6 +135,9 @@ class Lexico:
                 tokens.append(self.make_menor_que())
             elif self.current_char == '>':
                 tokens.append(self.make_mayor_que())
+            elif self.current_char == ',':
+                tokens.append(Token(T_COMA, pos_start=self.pos))
+                self.move()
             else:
                 pos_start= self.pos.copy()
                 character=self.current_char
@@ -157,6 +169,37 @@ class Lexico:
             self.move()
         token_type = T_KEYWORD if id_string in KEYWORDS else T_IDENTIFICADOR
         return Token(token_type,id_string,pos_start,self.pos)
+
+    def make_string(self):
+        string = ''
+        pos_start = self.pos.copy()
+        escape_char = False
+        self.move()
+        escape_characters = {
+            'n': '\n',
+            't': '\t'
+        }
+        while self.current_char != None and (self.current_char != '"' or escape_char):
+            if escape_char:
+                string += escape_characters.get(self.current_char, self.current_char)
+            else:
+                if self.current_char == '\\':
+                    escape_char= True
+                else:
+                    string += self.current_char
+            self.move()
+            escape_char=False
+        self.move()
+        return Token(T_STRING, string, pos_start, self.pos)
+
+    def make_minus_or_arrow(self):
+        token_type = T_MENOS
+        pos_start = self.pos.copy()
+        self.move()
+        if self.current_char == '>':
+            self.move()
+            token_type = T_FLECHA
+        return Token(token_type, pos_start=pos_start, pos_end=self.pos)
 
     def make_no_igual(self):
         pos_start = self.pos.copy()
@@ -204,6 +247,16 @@ class NumberNode:
     def __repr__(self):
         return f'{self.token}'
 ##########################################################
+# Clase StringNode: Tipo de nodo para strings
+#########################################################
+class StringNode:
+    def __init__(self,token):
+        self.token=token
+        self.pos_start= self.token.pos_start
+        self.pos_end= self.token.pos_end
+    def __repr__(self):
+        return f'{self.token}'
+##########################################################
 # Clase ListaNode: Tipo de nodo para listas
 #########################################################
 class ListNode:
@@ -214,7 +267,7 @@ class ListNode:
 ##########################################################
 # Clase varAccessNode: Tipo de nodo para acceso a variables
 #########################################################
-class varAccessNode:
+class VarAccessNode:
     def __init__(self, var_name_token):
         self.var_name_token = var_name_token
         self.pos_start = self.var_name_token.pos_start
@@ -222,7 +275,7 @@ class varAccessNode:
 ##########################################################
 # Clase varAssignNode: Tipo de nodo para su asignacion
 #########################################################
-class varAssignNode:
+class VarAssignNode:
     def __init__(self, var_name_token, value_node):
         self.var_name_token = var_name_token
         self.value_node = value_node
@@ -260,3 +313,13 @@ class IfNode:
         self.else_case = else_case
         self.pos_start = self.cases[0][0].pos_start
         self.pos_end = (self.else_case or self.cases[len(self.cases) - 1][0]).pos_end
+
+class CallNode:
+    def __init__(self, node_to_call, arg_nodes):
+        self.node_to_call = node_to_call
+        self.arg_nodes = arg_nodes
+        self.pos_start = self.node_to_call.pos_start
+        if len(self.arg_nodes) > 0:
+            self.pos_end = self.arg_nodes[len(self.arg_nodes) - 1].pos_end
+        else:
+            self.pos_end = self.node_to_call.pos_end

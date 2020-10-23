@@ -13,8 +13,18 @@ term            : factor ((MULTIPLICA|DIVIDE) factor)*
 factor	        : (SUMA|RESTA) factor
 				: power
 
-power		    : atom (POW factor)*
+power		    : call (POW factor)*
+
+call            : atom (LPAREN (expr (COMMA expr)*)? RPAREN)?
 
 atom 		    : ENTERO|DECIMAL|IDENTIFICADOR
 				: PARENTIZQ expr PARENTDER
+				: if-expr
+
+list-expr       : RECIZQ (expr (COMA expr)*)? RECTDER
+
+if-expr         : KEYWORD:IF expr
+                  (expr)
+                 | (NEWLINE statements)
+
 
