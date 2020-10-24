@@ -125,17 +125,16 @@ class Parser:
     def expr(self):
         res = ParseResult()
         if self.current_token.type == T_IDENTIFICADOR:
-            var_name = self.current_token
+            variable_name = self.current_token
             res.register_move()
             self.move()
-            if self.current_token.type != T_IGUAL:
-                return res.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end, "Expected ' = "))
-            res.register_move()
-            self.move()
-
-            expr = res.register(self.expr())
-            if res.error: return res
-            return res.success(VarAssignNode(var_name, expr))
+            if self.current_token.type == T_IGUAL:
+                res.register_move()
+                self.move()
+                expr = res.register(self.expr())
+                if res.error: return res
+                return res.success(VarAssignNode(variable_name, expr))
+            return res.success(VarAccessNode(variable_name))
         node = res.register(self.bin_operation(self.comp_expr, ((T_KEYWORD, "and"), (T_KEYWORD, 'or'))))
         if res.error:
             return res.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,"Expected 'if', int, float, identifier, '+', '-' or '('"))
