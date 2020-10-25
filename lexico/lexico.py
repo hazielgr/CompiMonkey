@@ -53,9 +53,10 @@ T_COMP_MAYORIGUAL=     'COMP_MAYORIGUAL'
 T_NEWLINE	   =       'NEWLINE'
 T_COMA         =       'COMA'
 T_FLECHA	   =       'FLECHA'
+T_PUNTO        =       'PUNTO'
 
 KEYWORDS = [
-    'and' , 'or' , 'not', 'if', 'else',
+    'and' , 'or' , 'not', 'if', 'else','times','for','in','until','return'
 ]
 ##########################################################
 # Clase Token: Base para crear los tokens
@@ -93,6 +94,9 @@ class Lexico:
         while self.current_char != None:
             if self.current_char in ' \t':
                 self.move()
+            elif self.current_char in '\n':
+                tokens.append(Token(T_NEWLINE, pos_start=self.pos))
+                self.move()
             elif self.current_char in DIGITOS:
                 tokens.append(self.make_numero())
             elif self.current_char in LETRAS:
@@ -106,6 +110,9 @@ class Lexico:
                 tokens.append(self.make_minus_or_arrow())
             elif self.current_char == '*':
                 tokens.append(Token(T_MULTIPLICA,pos_start=self.pos))
+                self.move()
+            elif self.current_char == '.':
+                tokens.append(Token(T_PUNTO,pos_start=self.pos))
                 self.move()
             elif self.current_char == '/':
                 tokens.append(Token(T_DIVIDE,pos_start=self.pos))
@@ -305,15 +312,8 @@ class UnaryOpNode:
     def __repr__(self):
         return f'({self.op_token}, {self.node})'
 ##########################################################
-# Clase IfNode: Tipo de Nodo para if
+# Clase CallNode: Tipo de Nodo para call
 #########################################################
-class IfNode:
-    def __init__(self, cases, else_case):
-        self.cases = cases
-        self.else_case = else_case
-        self.pos_start = self.cases[0][0].pos_start
-        self.pos_end = (self.else_case or self.cases[len(self.cases) - 1][0]).pos_end
-
 class CallNode:
     def __init__(self, node_to_call, arg_nodes):
         self.node_to_call = node_to_call
@@ -323,3 +323,41 @@ class CallNode:
             self.pos_end = self.arg_nodes[len(self.arg_nodes) - 1].pos_end
         else:
             self.pos_end = self.node_to_call.pos_end
+##########################################################
+# Clase IfNode: Tipo de Nodo para if
+#########################################################
+class IfNode:
+    def __init__(self, cases, else_case):
+        self.cases = cases
+        self.else_case = else_case
+        self.pos_start = self.cases[0][0].pos_start
+        self.pos_end = (self.else_case or self.cases[len(self.cases) - 1][0]).pos_end
+
+##########################################################
+# Clase ForNode: Tipo de Nodo para for
+#########################################################
+class ForNode:
+    def __init__(self, var_name_token, start_value_node, end_value_node, body_node):
+        self.var_name_token = var_name_token
+        self.start_value_node = start_value_node
+        self.end_value_node = end_value_node
+        self.body_node = body_node
+        self.pos_start = self.var_name_token.pos_start
+        self.pos_end = self.body_node.pos_end
+##########################################################
+# Clase UntilNode: Tipo de Nodo para until
+#########################################################
+class UntilNode:
+    def __init__(self, condition_node, body_node):
+        self.condition_node = condition_node
+        self.body_node = body_node
+        self.pos_start = self.condition_node.pos_start
+        self.pos_end = self.body_node.pos_end
+##########################################################
+# Clase ReturnNode: Tipo de Nodo para return
+#########################################################
+class ReturnNode:
+  def __init__(self, node_to_return, pos_start, pos_end):
+    self.node_to_return = node_to_return
+    self.pos_start = pos_start
+    self.pos_end = pos_end

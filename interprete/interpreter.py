@@ -98,7 +98,6 @@ class Interpreter:
         if error: res.failure(error)
         else:
             return res.success(number.set_pos(node.pos_start,node.pos_end))
-
     def visit_IfNode(self, node, context):
         res = RunTimeResult()
         for condition, expr in node.cases:
@@ -113,3 +112,46 @@ class Interpreter:
             if res.error: return res
             return res.success(else_value)
         return res.success(None)
+
+    def visit_ForNode(self, node, context):
+        res = RunTimeResult()
+        elements = []
+        start_value = res.register(self.visit(node.start_value_node, context))
+        if res.error: return res
+        end_value = res.register(self.visit(node.end_value_node, context))
+        if res.error: return res
+        if node.step_value_node:
+            step_value = res.register(self.visit(node.step_value_node, context))
+            if res.error: return res
+        else:
+            step_value = Numero(1)
+        i = start_value.value
+        if step_value.value >= 0:
+            condition = lambda: i < end_value.value
+        else:
+            condition = lambda: i > end_value.value
+        while condition():
+            context.symbol_table.set(node.var_name_token.value, Numero(i))
+            i += step_value.value
+            value = res.register(self.visit(node.body_node, context))
+            if res.error: return res
+            elements.append(value)
+        return res.success(List(elements).set_context(context).set_pos(node.pos_start, node.pos_end))
+    def visit_UntilNode(self, node, context):
+        res = RunTimeResult()
+        elements = []
+        while True:
+            condition = res.register(self.visit(node.condition_node, context))
+            if res.error: return res
+            if not condition.is_true():
+                break
+            value = res.register(self.visit(node.body_node, context))
+            if res.error:return res
+            elements.append(value)
+        return res.success(List(elements).set_context(context).set_pos(node.pos_start, node.pos_end))
+    def visit_ReturnNode(self, node, context):
+        res = RunTimeResult()
+        if node.node_to_return:
+            value = res.register(self.visit(node.node_to_return, context))
+            if res.error: return res
+        return res.success(value)

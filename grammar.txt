@@ -23,8 +23,15 @@ atom 		    : ENTERO|DECIMAL|IDENTIFICADOR
 
 list-expr       : RECIZQ (expr (COMA expr)*)? RECTDER
 
-if-expr         : KEYWORD:IF expr
-                  (expr)
-                 | (NEWLINE statements)
+if-expr         : KEYWORD:if expr
+                  (NEWLINE statements)
+                  KEYWORD:else
+                  (NEWLINE statements)
+
+for-expr    : KEYWORD:FOR IDENTIFIER EQ expr KEYWORD:in expr
+              (NEWLINE statements)
+
+until-expr  : KEYWORD:until expr
+              (NEWLINE statements)
 
 
