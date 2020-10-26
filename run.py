@@ -1,6 +1,6 @@
 from parsero.Parser import *
 from interprete.Interpreter import *
-from interprete.Contexto import *
+from interprete.Context import *
 from interprete.TablaDeSimbolos import *
 tabla_simbolos_global = TablaDeSimbolos()
 tabla_simbolos_global.set("null",Numero.null)

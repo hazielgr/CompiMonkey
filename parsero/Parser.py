@@ -145,10 +145,18 @@ class Parser:
             if self.current_token.type == T_IGUAL:
                 res.register_move()
                 self.move()
+                if self.current_token.type == T_PARENTIZQ:
+                    func_def = res.register(self.func_def(variable_name))
+                    if res.error: return res
+                    return res.success(func_def)
                 expr = res.register(self.expr())
                 if res.error: return res
                 return res.success(VarAssignNode(variable_name, expr))
+            if self.current_token.type == T_PUNTO:
+                res.register_move()
+                self.move()
             return res.success(VarAccessNode(variable_name))
+
         node = res.register(self.bin_operation(self.comp_expr, ((T_KEYWORD, "and"), (T_KEYWORD, 'or'))))
         if res.error:
             return res.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,"Expected 'if','for','until', int, float, identifier, '+', '-' or '('"))
@@ -279,7 +287,7 @@ class Parser:
         self.move()
 
         if self.current_token.type != T_IGUAL:
-            return res.failure(InvalidSyntaxError(self.current_tok.pos_start, self.current_token.pos_end,f"Expected '='"))
+            return res.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,f"Expected '='"))
         res.register_move()
         self.move()
         condition_value = res.register(self.expr())
@@ -331,3 +339,52 @@ class Parser:
         self.move()
         return res.success(UntilNode(condition, body, False))
 
+    def func_def(self,functionName):
+        res = ParseResult()
+        if self.current_token.type != T_PARENTIZQ:
+            return res.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end, f"Expected '('"))
+        res.register_move()
+        self.move()
+        if self.current_token.type != T_PARENTDER:
+            return res.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end, f"Expected ')'"))
+        res.register_move()
+        self.move()
+        if self.current_token.type != T_FLECHA:
+            return res.failure(
+                InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end, f"Expected '->'"))
+        res.register_move()
+        self.move()
+        if self.current_token.type != T_NEWLINE:
+            return res.failure(
+                InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end, f"Expected 'NEWLINE'"))
+        res.register_move()
+        self.move()
+
+        arg_name_tokens = []
+        if self.current_token.type == T_IDENTIFICADOR:
+            arg_name_tokens.append(self.current_token)
+            res.register_move()
+            self.move()
+            while self.current_token.type == T_COMA:
+                res.register_move()
+                self.move()
+                if self.current_token.type != T_IDENTIFICADOR:
+                    return res.failure(InvalidSyntaxError(
+                        self.current_token.pos_start, self.current_token.pos_end,f"Expected identifier"))
+                arg_name_tokens.append(self.current_token)
+                res.register_move()
+                self.move()
+            if self.current_token.type != T_PARENTDER:
+                return res.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,f"Expected ',' or ')'"))
+        else:
+            if self.current_token.type != T_PARENTDER:
+                return res.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,f"Expected identifier or ')'"))
+        res.register_move()
+        self.move()
+        if self.current_token.type != T_NEWLINE:
+            return res.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,f"Expected 'NEWLINE'"))
+        res.register_move()
+        self.move()
+        node_to_return = res.register(self.expr())
+        if res.error: return res
+        return res.success(FuncDefNode(functionName,arg_name_tokens,node_to_return))
