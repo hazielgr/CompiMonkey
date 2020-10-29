@@ -1,5 +1,4 @@
 from lexico.Lexico import *
-from errores.ErrorHandler import *
 from parsero.ParseResult import *
 ##########################################################
 # Clase Parser: Se define la sintaxis, la gramatica como esta compuesta
@@ -23,7 +22,7 @@ class Parser:
     def parse(self):
         res = self.statements()
         if not res.error and self.current_token.type != T_EOF:
-            return res.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,"Token cannot appear after previous tokens"))
+            return res.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,"Couldn parse that token"))
         return res
 
     def statements(self):
