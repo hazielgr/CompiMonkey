@@ -70,6 +70,16 @@ def main():
     deleteKey = False  # booleano que revisa si se quiere borrar
     returnKey = False  # booleano que revisa si se quiere cambiar de linea
 
+    # buttons
+    lvl1_button = Button(1, CREAM, buttonx, buttony, 100, 50, "lvl1")
+    lvl2_button = Button(2, CREAM, buttonx + 110, buttony, 100, 50, "lvl2")
+    lvl3_button = Button(3, CREAM, buttonx + 220, buttony, 100, 50, "lvl3")
+    lvl4_button = Button(4, CREAM, buttonx + 330, buttony, 100, 50, "lvl4")
+    lvl5_button = Button(5, CREAM, buttonx + 440, buttony, 100, 50, "lvl5")
+    lvl6_button = Button(6, CREAM, buttonx + 550, buttony, 100, 50, "lvl6")
+
+    run_button = Button(10, GREEN, buttonx + 1200, buttony, 100, 50, "RUN")
+
     insertPoint = 0
     camerax = 0
     cameray = 0
@@ -97,8 +107,14 @@ def main():
         camerax, cameray = adjustCamera(mainList, lineNumber, insertPoint, cursorRect, mainFont, camerax, cameray,
                                         windowWidth, windowHeight)
 
-        newChar, typeChar, deleteKey, returnKey, directionKey, windowWidth, windowHeight, mouseX, mouseY, mouseClicked = getInput(
-            windowWidth, windowHeight)
+
+
+        buttons = [lvl1_button, lvl2_button, lvl3_button, lvl4_button, lvl5_button, lvl6_button, run_button]
+
+
+
+        newChar, typeChar, deleteKey, returnKey, directionKey, windowWidth, windowHeight, mouseX, mouseY, mouseClicked, changelvl = getInput(
+            windowWidth, windowHeight, buttons, changelvl, mainList)
 
         mainList, lineNumber, insertPoint, cursorRect = displayText(mainFont, newChar, typeChar, mainList, deleteKey,
                                                                     returnKey, lineNumber, insertPoint, directionKey,
@@ -108,21 +124,16 @@ def main():
 
         displayInfo(insertPoint, mainFont, cursorRect, camerax, windowWidth, windowHeight, displaySurf)
 
-        # buttons
-        lvl1_button = Button(1, CREAM, buttonx, buttony, 100, 50, "lvl1")
-        lvl2_button = Button(2, CREAM, buttonx + 110, buttony, 100, 50, "lvl2")
-        lvl3_button = Button(3, CREAM, buttonx + 220, buttony, 100, 50, "lvl3")
-        lvl4_button = Button(4, CREAM, buttonx + 330, buttony, 100, 50, "lvl4")
-        lvl5_button = Button(5, CREAM, buttonx + 440, buttony, 100, 50, "lvl5")
-        lvl6_button = Button(6, CREAM, buttonx + 550, buttony, 100, 50, "lvl6")
 
-        buttons = [lvl1_button, lvl2_button, lvl3_button, lvl4_button, lvl5_button, lvl6_button]
 
         # level manager
         if currentlvl != changelvl:
+
             lvlActors = levelManager(changelvl)
             currentlvl = changelvl
-            
+
+
+
 
         blitLevel(lvlActors, displaySurf, grid)
 
@@ -130,16 +141,9 @@ def main():
         for i in range(len(buttons)):
             buttons[i].draw(displaySurf)
 
-        # revisa si el mouse fue clickeado
-        for event in pygame.event.get():
-            mousePos = pygame.mouse.get_pos()
 
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                for i in range(len(buttons)):
-                    if buttons[i].isOver(mousePos):
-                        changelvl = buttons[i].lvl
 
-        checkCollision(lvlActors)
+        checkCollision(lvlActors, mainList)
 
         # mov mono
         if len(lvlActors) != 0:
@@ -165,7 +169,7 @@ def displayText(mainFont, newChar, typeChar, mainList, deleteKey, returnKey, lin
         cursorRect.x = STARTX
         stringRect = getStringRectAtInsertPoint(mainList, lineNumber, insertPoint, mainFont, camerax, cameray)
         cursorRect.y = stringRect.top
-        printmainList(mainList)
+
 
     elif mouseClicked:
         insertPoint, lineNumber, cursorRect = setCursorToClick(mainList, cursorRect, mainFont, camerax, cameray, mouseX,
@@ -352,7 +356,7 @@ def score(displaySurf, lvlActors):
     displaySurf.blit(text, (100, 7))
 
 
-def checkCollision(lvlActors):
+def checkCollision(lvlActors, mainList):
     if len(lvlActors) != 0:
         monkey = lvlActors[0]
         for banana in range(len(lvlActors[1])):
@@ -362,6 +366,8 @@ def checkCollision(lvlActors):
                         lvlActors[1][banana].hitbox[0] + lvlActors[1][banana].hitbox[2]:
                     lvlActors[2] += 1
                     lvlActors[1].pop(banana)
+                    print("MMM QUE RICO UNA BANANA")
+
 
 
 def blitLevel(lvlActors, displaySurf, grid):
@@ -390,7 +396,7 @@ def blitLevel(lvlActors, displaySurf, grid):
         posx = 0
         posy = 0
 
-        while counterx < 16:
+        while counterx < 8:
             while countery < 18:
                 rect = (posx, posy, width, height)
                 grid += [rect]
@@ -446,7 +452,7 @@ def drawCursor(mainFont, cursorRect, displaySurf):
     displaySurf.blit(cursor, cursorRect)
 
 
-def getInput(windowWidth, windowHeight):
+def getInput(windowWidth, windowHeight, buttons, changelvl, mainList):
     newChar = False
     typeChar = False
     deleteKey = False
@@ -455,12 +461,14 @@ def getInput(windowWidth, windowHeight):
     mouseX = 0
     mouseY = 0
     mouseClicked = False
-    mousePos = pygame.mouse.get_pos()
+
 
     for event in pygame.event.get():
+        mousePos = pygame.mouse.get_pos()
         if event.type == QUIT:
             pygame.quit()
             sys.exit()
+
 
         elif event.type == KEYDOWN:
             if event.key == K_BACKSPACE:
@@ -495,10 +503,21 @@ def getInput(windowWidth, windowHeight):
 
 
         elif event.type == MOUSEBUTTONDOWN:
+
+            for i in range(len(buttons)):
+                if buttons[i].isOver(mousePos):
+                    if buttons[i].lvl == 10:
+                        print("RUN")
+                        print(mainList)
+                    else:
+
+                        changelvl = buttons[i].lvl
+
+
             mouseX, mouseY = event.pos
             mouseClicked = True
 
-    return newChar, typeChar, deleteKey, returnKey, directionKey, windowWidth, windowHeight, mouseX, mouseY, mouseClicked
+    return newChar, typeChar, deleteKey, returnKey, directionKey, windowWidth, windowHeight, mouseX, mouseY, mouseClicked, changelvl
 
     # Estas funciones basicamente envuelven lo que es el cursor
 
@@ -630,9 +649,7 @@ def getStringRenderAndRect(string, mainFont):
     return stringRender, stringRect
 
 
-def printmainList(mainList):
-    for item in mainList[:-1]:
-        print(item)
+
 
 
 if __name__ == '__main__':

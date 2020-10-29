@@ -11,8 +11,6 @@ class Banana:
         self.posy = posy
         self.hitbox = (posx + 7, posy + 5, 170, 120)
 
-    def collision(self):
-        print("MMM RICO UNA BANANA")
 
 
 class Monkey:
