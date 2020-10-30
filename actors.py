@@ -16,8 +16,10 @@ class Banana:
 class Monkey:
 
     def __init__(self, posx, posy):
+        self.direction = "up"
         self.sprite = monkeyhead_sprite
         self.score = 0
         self.posx = posx
         self.posy = posy
         self.hitbox = (posx + 10, posy + 35, 375, 305)
+        self.move = True

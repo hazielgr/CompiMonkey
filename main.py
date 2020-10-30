@@ -44,6 +44,7 @@ banana_sprite = pygame.image.load('resources/sprites/jungle_banana_icon.png')
 buttons = []
 buttonx = 0
 buttony = 850
+lvlActors = []
 
 
 def main():
@@ -79,6 +80,9 @@ def main():
     lvl6_button = Button(6, CREAM, buttonx + 550, buttony, 100, 50, "lvl6")
 
     run_button = Button(10, GREEN, buttonx + 1200, buttony, 100, 50, "RUN")
+    erase_button = Button(11, RED, buttonx + 1310, buttony, 100, 50, "ERASE")
+
+    buttons = [lvl1_button, lvl2_button, lvl3_button, lvl4_button, lvl5_button, lvl6_button, run_button, erase_button]
 
     insertPoint = 0
     camerax = 0
@@ -107,14 +111,8 @@ def main():
         camerax, cameray = adjustCamera(mainList, lineNumber, insertPoint, cursorRect, mainFont, camerax, cameray,
                                         windowWidth, windowHeight)
 
-
-
-        buttons = [lvl1_button, lvl2_button, lvl3_button, lvl4_button, lvl5_button, lvl6_button, run_button]
-
-
-
-        newChar, typeChar, deleteKey, returnKey, directionKey, windowWidth, windowHeight, mouseX, mouseY, mouseClicked, changelvl = getInput(
-            windowWidth, windowHeight, buttons, changelvl, mainList)
+        newChar, typeChar, deleteKey, returnKey, directionKey, windowWidth, windowHeight, mouseX, mouseY, mouseClicked, changelvl, mainList = getInput(
+            windowWidth, windowHeight, buttons, changelvl, mainList, lvlActors)
 
         mainList, lineNumber, insertPoint, cursorRect = displayText(mainFont, newChar, typeChar, mainList, deleteKey,
                                                                     returnKey, lineNumber, insertPoint, directionKey,
@@ -124,16 +122,10 @@ def main():
 
         displayInfo(insertPoint, mainFont, cursorRect, camerax, windowWidth, windowHeight, displaySurf)
 
-
-
         # level manager
         if currentlvl != changelvl:
-
             lvlActors = levelManager(changelvl)
             currentlvl = changelvl
-
-
-
 
         blitLevel(lvlActors, displaySurf, grid)
 
@@ -142,12 +134,10 @@ def main():
             buttons[i].draw(displaySurf)
 
 
-
         checkCollision(lvlActors, mainList)
-
-        # mov mono
         if len(lvlActors) != 0:
-            lvlActors[0].posy += 1
+            if lvlActors[0].move:
+                lvlActors[0].posx += 1
 
         score(displaySurf, lvlActors)
         pygame.display.update()
@@ -344,6 +334,11 @@ def displayText(mainFont, newChar, typeChar, mainList, deleteKey, returnKey, lin
     return mainList, lineNumber, insertPoint, cursorRect
 
 
+def distanceTo(actor, lvlActors):
+    print(len(lvlActors))
+    return math.sqrt(pow((lvlActors[0].posx - actor.posx), 2) + pow((lvlActors[0].posy - actor.posy), 2))
+
+
 def score(displaySurf, lvlActors):
     banana_aux = pygame.transform.scale(banana_sprite, (92, 64))
 
@@ -357,6 +352,7 @@ def score(displaySurf, lvlActors):
 
 
 def checkCollision(lvlActors, mainList):
+    mapsurface = lvlActors[8:]
     if len(lvlActors) != 0:
         monkey = lvlActors[0]
         for banana in range(len(lvlActors[1])):
@@ -366,8 +362,13 @@ def checkCollision(lvlActors, mainList):
                         lvlActors[1][banana].hitbox[0] + lvlActors[1][banana].hitbox[2]:
                     lvlActors[2] += 1
                     lvlActors[1].pop(banana)
-                    print("MMM QUE RICO UNA BANANA")
-
+        for i in range(len(mapsurface)):
+            if mapsurface[i][2] == "bush":
+                if monkey.posy < mapsurface[i][1][1] + mapsurface[i][1][3] and monkey.posy + \
+                        monkey.hitbox[3] > mapsurface[i][1][1]:
+                    if monkey.posx + monkey.hitbox[2] > mapsurface[i][1][0] and monkey.posx < \
+                            mapsurface[i][1][0] + mapsurface[i][1][2]:
+                        monkey.move = False
 
 
 def blitLevel(lvlActors, displaySurf, grid):
@@ -407,7 +408,6 @@ def blitLevel(lvlActors, displaySurf, grid):
             posx += 100
             countery = 0
             counterx += 1
-
 
 
 # le hace blit a todas las string en mainList al surface object
@@ -452,7 +452,8 @@ def drawCursor(mainFont, cursorRect, displaySurf):
     displaySurf.blit(cursor, cursorRect)
 
 
-def getInput(windowWidth, windowHeight, buttons, changelvl, mainList):
+
+def getInput(windowWidth, windowHeight, buttons, changelvl, mainList, lvlActors):
     newChar = False
     typeChar = False
     deleteKey = False
@@ -461,7 +462,6 @@ def getInput(windowWidth, windowHeight, buttons, changelvl, mainList):
     mouseX = 0
     mouseY = 0
     mouseClicked = False
-
 
     for event in pygame.event.get():
         mousePos = pygame.mouse.get_pos()
@@ -507,17 +507,27 @@ def getInput(windowWidth, windowHeight, buttons, changelvl, mainList):
             for i in range(len(buttons)):
                 if buttons[i].isOver(mousePos):
                     if buttons[i].lvl == 10:
+                        mainListaux = []
+                        mainListString = ""
                         print("RUN")
+                        for i in range(len(mainList)):
+                            mainListaux.append(mainList[i])
+                        for i in range(len(mainListaux)):
+                            mainListaux[i] += ";"
+                        for i in range(len(mainList)):
+                            mainListString += mainListaux[i]
                         print(mainList)
+                        print(mainListaux)
+                        print(mainListString)
+                    elif buttons[i].lvl == 11:
+                        mainList = [""]
                     else:
-
                         changelvl = buttons[i].lvl
-
 
             mouseX, mouseY = event.pos
             mouseClicked = True
 
-    return newChar, typeChar, deleteKey, returnKey, directionKey, windowWidth, windowHeight, mouseX, mouseY, mouseClicked, changelvl
+    return newChar, typeChar, deleteKey, returnKey, directionKey, windowWidth, windowHeight, mouseX, mouseY, mouseClicked, changelvl, mainList
 
     # Estas funciones basicamente envuelven lo que es el cursor
 
@@ -647,9 +657,6 @@ def getStringRenderAndRect(string, mainFont):
     stringRect = stringRender.get_rect()
 
     return stringRender, stringRect
-
-
-
 
 
 if __name__ == '__main__':
