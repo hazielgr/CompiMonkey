@@ -15,10 +15,11 @@ def level1():
     grass2 = [GREEN, (0, 400, 800, 500), "grass"]
     bush = [DARKGREEN, (300, 400, 100, 500), "bush"]
     # actores dentro del mapa
-    banana2 = Banana(250, 500)
-    monkey = Monkey(900, 400)
+    banana2 = Banana(200, 500)
+    monkey = Monkey(200, 200)
+    pad = Pad(200,300)
     bananas = [banana2]
-    turtles = []
+    turtles = [pad]
     matches = []
     alligators = []
     rats = []
@@ -57,7 +58,7 @@ def level3():
     bush2 = [DARKGREEN, (400, 600, 100, 900), "bush"]
     # actores dentro del mapa
     banana1 = Banana(100, 100)
-    monkey = Monkey(-210, 0)
+    monkey = Monkey(100, 0)
     bananas = [banana1]
     turtles = []
     matches = []

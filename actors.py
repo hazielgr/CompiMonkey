@@ -1,7 +1,10 @@
 import pygame
 
 banana_sprite = pygame.image.load('resources/sprites/jungle_banana_icon.png')
-monkeyhead_sprite = pygame.image.load('resources/sprites/monkey_head_icon.png')
+pad_sprite = pygame.image.load('resources/sprites/leaf.png')
+banana_sprite = pygame.transform.scale(banana_sprite,(100,100))
+monkeyhead_sprite = pygame.image.load('resources/sprites/Mona/MonaDer.png')
+monkeyhead_sprite = pygame.transform.scale(monkeyhead_sprite,(100,100))
 
 class Banana:
 
@@ -9,7 +12,7 @@ class Banana:
         self.sprite = banana_sprite
         self.posx = posx
         self.posy = posy
-        self.hitbox = (posx + 7, posy + 5, 170, 120)
+        self.hitbox = (posx , posy , 100, 100)
 
 
 
@@ -21,5 +24,24 @@ class Monkey:
         self.score = 0
         self.posx = posx
         self.posy = posy
-        self.hitbox = (posx + 10, posy + 35, 375, 305)
+        self.hitbox = (posx + 10, posy + 35, 50, 50)
         self.move = True
+
+class Pad:
+    def __init__(self,posx, posy):
+        self.sprite = pad_sprite
+        self.posx = posx
+        self.posy = posy
+        self.dir = "right"
+        self.hitbox = (posx , posy, 100, 100)
+        self.mounted = False
+
+    def movingpad(self):
+        if self.dir == "right":
+            if self.posx <700:
+                self.posx += 100
+            else: self.dir = "left"
+        elif self.dir == "left" :
+            if self.posx >99:
+                self.posx -=100;
+            else: self.dir = "right"

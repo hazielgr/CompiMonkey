@@ -8,7 +8,7 @@ from button import *
 
 DISPLAYWIDTH = 1600
 DISPLAYHEIGHT = 900
-FPS = 30
+FPS = 3
 TEXTHEIGHT = 20
 STARTX = 800
 STARTY = 0
@@ -135,9 +135,13 @@ def main():
 
 
         checkCollision(lvlActors, mainList)
-        if len(lvlActors) != 0:
-            if lvlActors[0].move:
-                lvlActors[0].posx += 1
+
+        #if len(lvlActors) != 0:
+         #   monkey = lvlActors[0]
+          #  if lvlActors[3]!= []:
+           #     lvlActors[3][0].movingpad()
+            #    if lvlActors[3][0].mounted:
+             #       monkey.posx = lvlActors[3][0].posx
 
         score(displaySurf, lvlActors)
         pygame.display.update()
@@ -362,8 +366,23 @@ def checkCollision(lvlActors, mainList):
                         lvlActors[1][banana].hitbox[0] + lvlActors[1][banana].hitbox[2]:
                     lvlActors[2] += 1
                     lvlActors[1].pop(banana)
+
+        for pad in range(len(lvlActors[3])):
+            if monkey.posy < lvlActors[3][pad].hitbox[1] + lvlActors[3][pad].hitbox[3] and monkey.posy + \
+                    monkey.hitbox[3] > lvlActors[3][pad].hitbox[1]:
+                if monkey.posx + monkey.hitbox[2] > lvlActors[3][pad].hitbox[0] and monkey.posx < \
+                        lvlActors[3][pad].hitbox[0] + lvlActors[3][pad].hitbox[2]:
+                    lvlActors[3][pad].mounted = True
+
+
         for i in range(len(mapsurface)):
             if mapsurface[i][2] == "bush":
+                if monkey.posy < mapsurface[i][1][1] + mapsurface[i][1][3] and monkey.posy + \
+                        monkey.hitbox[3] > mapsurface[i][1][1]:
+                    if monkey.posx + monkey.hitbox[2] > mapsurface[i][1][0] and monkey.posx < \
+                            mapsurface[i][1][0] + mapsurface[i][1][2]:
+                        monkey.move = False
+            if mapsurface[i][2] == "river":
                 if monkey.posy < mapsurface[i][1][1] + mapsurface[i][1][3] and monkey.posy + \
                         monkey.hitbox[3] > mapsurface[i][1][1]:
                     if monkey.posx + monkey.hitbox[2] > mapsurface[i][1][0] and monkey.posx < \
@@ -379,15 +398,21 @@ def blitLevel(lvlActors, displaySurf, grid):
         for i in range(len(mapsurface)):
             pygame.draw.rect(displaySurf, mapsurface[i][0], mapsurface[i][1])
 
+        # leaf
+        for pad in range(len(lvlActors[3])):
+            displaySurf.blit(lvlActors[3][pad].sprite, (lvlActors[3][pad].posx, lvlActors[3][pad].posy))
+            pygame.draw.rect(displaySurf, BLACK, lvlActors[3][pad].hitbox, 2)
         # monkey y su hitbox
         displaySurf.blit(lvlActors[0].sprite, (lvlActors[0].posx, lvlActors[0].posy))
         pygame.draw.rect(displaySurf, BLACK, lvlActors[0].hitbox, 2)
-        lvlActors[0].hitbox = (lvlActors[0].posx + 11, lvlActors[0].posy + 35, 375, 305)
+        lvlActors[0].hitbox = (lvlActors[0].posx + 0, lvlActors[0].posy + 0, 100, 100)
 
         # bananas y sus hitboxes
         for banana in range(len(lvlActors[1])):
             displaySurf.blit(lvlActors[1][banana].sprite, (lvlActors[1][banana].posx, lvlActors[1][banana].posy))
             pygame.draw.rect(displaySurf, BLACK, lvlActors[1][banana].hitbox, 2)
+
+
 
         # grid
         counterx = 0
@@ -451,8 +476,6 @@ def drawCursor(mainFont, cursorRect, displaySurf):
     cursor = mainFont.render('l', True, WHITE, WHITE)
     displaySurf.blit(cursor, cursorRect)
 
-
-
 def getInput(windowWidth, windowHeight, buttons, changelvl, mainList, lvlActors):
     newChar = False
     typeChar = False
@@ -468,7 +491,6 @@ def getInput(windowWidth, windowHeight, buttons, changelvl, mainList, lvlActors)
         if event.type == QUIT:
             pygame.quit()
             sys.exit()
-
 
         elif event.type == KEYDOWN:
             if event.key == K_BACKSPACE:
@@ -488,6 +510,15 @@ def getInput(windowWidth, windowHeight, buttons, changelvl, mainList, lvlActors)
                 directionKey = UP
             elif event.key == K_DOWN:
                 directionKey = DOWN
+            elif event.key == K_LCTRL :
+                if len(lvlActors) != 0:
+                    if lvlActors [3][0].mounted:
+                        lvlActors[3][0].mounted = False
+                    if lvlActors[0].move:
+                        lvlActors[0].posy += 20
+                    else:
+                        lvlActors[0].posy -= 20
+                        lvlActors[0].move =True
             else:
                 newChar = event.unicode
                 typeChar = True
@@ -499,8 +530,6 @@ def getInput(windowWidth, windowHeight, buttons, changelvl, mainList, lvlActors)
             displaySurf.fill(WHITE)
             displaySurf.convert()
             pygame.display.update()
-
-
 
         elif event.type == MOUSEBUTTONDOWN:
 
@@ -521,6 +550,8 @@ def getInput(windowWidth, windowHeight, buttons, changelvl, mainList, lvlActors)
                         print(mainListString)
                     elif buttons[i].lvl == 11:
                         mainList = [""]
+                        mainListaux = [""]
+                        mainListString =""
                     else:
                         changelvl = buttons[i].lvl
 
