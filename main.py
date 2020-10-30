@@ -45,10 +45,11 @@ buttons = []
 buttonx = 0
 buttony = 850
 lvlActors = []
-
+displaySurf = pygame.display.set_mode((1600, 900), RESIZABLE)
 
 def main():
-    global FPSCLOCK
+    global FPSCLOCK, displaySurf, lvlActors
+    move_monkey = False
     lvlActors = []
     grid = []
     changelvl = 0
@@ -113,7 +114,7 @@ def main():
                                         windowWidth, windowHeight)
 
         newChar, typeChar, deleteKey, returnKey, directionKey, windowWidth, windowHeight, mouseX, mouseY, mouseClicked, changelvl, mainList = getInput(
-            windowWidth, windowHeight, buttons, changelvl, mainList, lvlActors, deltaTime)
+            windowWidth, windowHeight, buttons, changelvl, mainList, lvlActors, deltaTime, displaySurf)
 
         mainList, lineNumber, insertPoint, cursorRect = displayText(mainFont, newChar, typeChar, mainList, deleteKey,
                                                                     returnKey, lineNumber, insertPoint, directionKey,
@@ -134,7 +135,7 @@ def main():
         for i in range(len(buttons)):
             buttons[i].draw(displaySurf)
 
-        checkCollision(lvlActors, deltaTime)
+        checkCollision(lvlActors)
 
         # if len(lvlActors) != 0:
         #   monkey = lvlActors[0]
@@ -355,7 +356,7 @@ def score(displaySurf, lvlActors):
     displaySurf.blit(text, (100, 7))
 
 
-def checkCollision(lvlActors, deltaTime):
+def checkCollision(lvlActors):
     mapsurface = lvlActors[8:]
     if len(lvlActors) != 0:
         monkey = lvlActors[0]
@@ -381,33 +382,38 @@ def checkCollision(lvlActors, deltaTime):
                     if monkey.posx + monkey.hitbox[2] > mapsurface[i][1][0] and monkey.posx < \
                             mapsurface[i][1][0] + mapsurface[i][1][2]:
                         monkey.move = False
-                        collisionDetected(monkey, deltaTime)
+                        collisionDetected(monkey)
             if mapsurface[i][2] == "river":
                 if monkey.posy < mapsurface[i][1][1] + mapsurface[i][1][3] and monkey.posy + \
                         monkey.hitbox[3] > mapsurface[i][1][1]:
                     if monkey.posx + monkey.hitbox[2] > mapsurface[i][1][0] and monkey.posx < \
                             mapsurface[i][1][0] + mapsurface[i][1][2]:
                         monkey.move = False
-                        collisionDetected(monkey, deltaTime)
+                        collisionDetected(monkey)
 
 
-def collisionDetected(monkey, deltaTime):
+def collisionDetected(monkey):
     if monkey.direction == "down":
         monkey.move = True
         monkey.direction = "up"
-        monkey.step(100, deltaTime)
+        monkey.step(1)
+        monkey.move = False
     elif monkey.direction == "up":
         monkey.move = True
         monkey.direction = "down"
-        monkey.step(100, deltaTime)
+        monkey.step(1)
+        monkey.move = False
     elif monkey.direction == "right":
         monkey.move = True
         monkey.direction = "left"
-        monkey.step(100, deltaTime)
+        monkey.step(1)
+        monkey.move = False
     elif monkey.direction == "left":
         monkey.move = True
         monkey.direction = "right"
-        monkey.step(100, deltaTime)
+        monkey.step(1)
+        monkey.move = False
+
 
 def blitLevel(lvlActors, displaySurf, grid):
     if len(lvlActors) != 0:
@@ -489,12 +495,36 @@ def adjustCamera(mainList, lineNumber, insertPoint, cursorRect, mainFont, camera
     return camerax, cameray
 
 
+def step(num):
+    contador = 1
+    step = 1
+    # loop que hace al mono moverse la cantidad de veces indicadas por el usuario
+    while contador <= num:
+        if lvlActors[8][2] == "desert":
+            pygame.draw.rect(displaySurf, DESERT, (lvlActors[0].posx, lvlActors[0].posy, 99, 99))
+        else:
+            pygame.draw.rect(displaySurf, GREEN, (lvlActors[0].posx, lvlActors[0].posy, 99, 99))
+        # cambia las posiciones posx y posy del mono
+        lvlActors[0].step(step)
+        # actualiza el hitbox y dibuja el mono en sus nuevas posiciones
+        lvlActors[0].hitbox = (lvlActors[0].posx, lvlActors[0].posy, 100, 100)
+        displaySurf.blit(lvlActors[0].sprite, (lvlActors[0].posx, lvlActors[0].posy))
+        # se cambia el valor del booleano por efectos de colisiones
+        lvlActors[0].move = True
+        contador += 1
+        pygame.time.wait(50)
+        checkCollision(lvlActors)
+        if lvlActors[0].move == False:
+            contador = num
+        pygame.display.update()
+
+
 def drawCursor(mainFont, cursorRect, displaySurf):
     cursor = mainFont.render('l', True, WHITE, WHITE)
     displaySurf.blit(cursor, cursorRect)
 
 
-def getInput(windowWidth, windowHeight, buttons, changelvl, mainList, lvlActors, deltaTime):
+def getInput(windowWidth, windowHeight, buttons, changelvl, mainList, lvlActors, deltaTime, displaySurf):
     newChar = False
     typeChar = False
     deleteKey = False
@@ -513,7 +543,7 @@ def getInput(windowWidth, windowHeight, buttons, changelvl, mainList, lvlActors,
         elif event.type == KEYDOWN:
             if event.key == K_BACKSPACE:
                 deleteKey = True
-                lvlActors[0].step(100, deltaTime)
+                step(3)
             elif event.key == K_ESCAPE:
                 newChar = 'escape'
             elif event.key == K_RETURN:

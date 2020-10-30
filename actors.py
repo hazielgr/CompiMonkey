@@ -27,16 +27,17 @@ class Monkey:
         self.hitbox = (posx + 10, posy + 35, 20, 20)
         self.move = True
 
-    def step(self, num, deltaTime):
+    def step(self, num):
+        print(self.move)
         if self.move:
             if self.direction == "up":
-                self.posy -= num
+                self.posy -= num*100
             if self.direction == "down":
-                self.posy += num
+                self.posy += num*100
             if self.direction == "right":
-                self.posx += num
+                self.posx += num*100
             elif self.direction == "left":
-                self.posx -= num
+                self.posx -= num*100
 
     def turn(self, direction):
         self.direction = direction
