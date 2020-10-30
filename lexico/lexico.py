@@ -3,9 +3,11 @@ import string
 ##########################################################
 # Constantes: usadas en el analizador lexico
 #########################################################
+MINUSCULA = string.ascii_lowercase
 LETRAS = string.ascii_letters
 DIGITOS = '0123456789'
-LETRAS_DIGITOS = LETRAS + DIGITOS
+SPECIAL = '@ $ ?'
+LETRAS_SPECIALES = LETRAS + SPECIAL
 ##########################################################
 # Clase Position: lleva registro de cual charac lee
 #########################################################
@@ -94,12 +96,12 @@ class Lexico:
         while self.current_char != None:
             if self.current_char in ' \t':
                 self.move()
-            elif self.current_char in '\n':
+            elif self.current_char in ';\n':
                 tokens.append(Token(T_NEWLINE, pos_start=self.pos))
                 self.move()
             elif self.current_char in DIGITOS:
                 tokens.append(self.make_numero())
-            elif self.current_char in LETRAS:
+            elif self.current_char in MINUSCULA:
                 tokens.append(self.make_identificador())
             elif self.current_char == '"':
                 tokens.append(self.make_string())
@@ -149,7 +151,7 @@ class Lexico:
                 pos_start= self.pos.copy()
                 character=self.current_char
                 self.move()
-                return [],IllegalCharacError(pos_start,self.pos,"'"+ character+ "'")
+                return [],IllegalCharacError(pos_start,self.pos,"'"+ character+ "'" + " O quitar la mayuscula al inicio")
         tokens.append(Token(T_EOF, pos_start=self.pos))
         return tokens,None
 
@@ -171,7 +173,7 @@ class Lexico:
     def make_identificador(self):
         id_string = ''
         pos_start = self.pos.copy()
-        while self.current_char != None and self.current_char in LETRAS_DIGITOS + '_':
+        while self.current_char != None and self.current_char in LETRAS_SPECIALES + '_':
             id_string += self.current_char
             self.move()
         token_type = T_KEYWORD if id_string in KEYWORDS else T_IDENTIFICADOR
