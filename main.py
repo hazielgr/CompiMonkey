@@ -1,4 +1,4 @@
-import pygame, sys, math
+import pygame, sys, math,threading
 from pygame.locals import *
 from levels import level1
 from lvlManager import *
@@ -37,9 +37,11 @@ DARKCREAM = (255, 242, 180)
 BGCOLOR = GRAY
 TEXTCOLOR = WHITE
 
-icon = pygame.image.load('resources/sprites/monkey_head_icon.png')
-monkeyhead_sprite = pygame.image.load('resources/sprites/monkey_head_icon.png')
+#icon = pygame.image.load('resources/sprites/monkey_head_icon.png')
+##monkeyhead_sprite = pygame.image.load('resources/sprites/monkey_head_icon.png')
 banana_sprite = pygame.image.load('resources/sprites/jungle_banana_icon.png')
+
+
 
 buttons = []
 buttonx = 0
@@ -50,6 +52,7 @@ displaySurf = pygame.display.set_mode((1600, 900), RESIZABLE)
 def main():
     global FPSCLOCK, displaySurf, lvlActors
     move_monkey = False
+
     lvlActors = []
     grid = []
     changelvl = 0
@@ -99,11 +102,20 @@ def main():
     pygame.display.update()
 
     pygame.display.set_caption('CompiMonkey')
-    pygame.display.set_icon(icon)
+    ##pygame.display.set_icon(icon)
 
     mainFont = pygame.font.SysFont('Lucida Console', TEXTHEIGHT)
 
     cursorRect = getCursorRect(STARTX, STARTY + (TEXTHEIGHT + (TEXTHEIGHT / 4)), mainFont, camerax, cameray)
+
+    def moveleaf():
+        if len(lvlActors) != 0:
+            monkey = lvlActors[0]
+            if lvlActors[3]!= []:
+                deltaTime
+                lvlActors[3][0].movingpad()
+                if lvlActors[3][0].mounted:
+                    monkey.posx = lvlActors[3][0].posx
 
     # El loop del juego detecta el input del usuario y lo muestra en pantalla
     # coloca el cursor en la pantalla y ajusta la camara de ser necesario
@@ -135,14 +147,11 @@ def main():
         for i in range(len(buttons)):
             buttons[i].draw(displaySurf)
 
+        #moveleaf()
+
         checkCollision(lvlActors)
 
-        # if len(lvlActors) != 0:
-        #   monkey = lvlActors[0]
-        #  if lvlActors[3]!= []:
-        #     lvlActors[3][0].movingpad()
-        #    if lvlActors[3][0].mounted:
-        #       monkey.posx = lvlActors[3][0].posx
+
 
         score(displaySurf, lvlActors)
         pygame.display.update()
@@ -374,6 +383,8 @@ def checkCollision(lvlActors):
                 if monkey.posx + monkey.hitbox[2] > lvlActors[3][pad].hitbox[0] and monkey.posx < \
                         lvlActors[3][pad].hitbox[0] + lvlActors[3][pad].hitbox[2]:
                     lvlActors[3][pad].mounted = True
+            else:
+                lvlActors[3][pad].mounted = False
 
         for i in range(len(mapsurface)):
             if mapsurface[i][2] == "bush":
@@ -437,6 +448,14 @@ def blitLevel(lvlActors, displaySurf, grid):
             displaySurf.blit(lvlActors[1][banana].sprite, (lvlActors[1][banana].posx, lvlActors[1][banana].posy))
             pygame.draw.rect(displaySurf, BLACK, lvlActors[1][banana].hitbox, 2)
 
+        for match in range(len(lvlActors[4])):
+            displaySurf.blit(lvlActors[4][match].sprite, (lvlActors[4][match].posx, lvlActors[4][match].posy))
+            pygame.draw.rect(displaySurf, BLACK, lvlActors[4][match].hitbox, 2)
+
+        for coco in range(len(lvlActors[5])):
+            displaySurf.blit(lvlActors[5][coco].sprite, (lvlActors[5][coco].posx, lvlActors[5][coco].posy))
+            pygame.draw.rect(displaySurf, BLACK, lvlActors[5][coco].hitbox, 2)
+
         # grid
         counterx = 0
         countery = 0
@@ -494,7 +513,6 @@ def adjustCamera(mainList, lineNumber, insertPoint, cursorRect, mainFont, camera
 
     return camerax, cameray
 
-
 def step(num):
     contador = 1
     step = 1
@@ -518,11 +536,9 @@ def step(num):
             contador = num
         pygame.display.update()
 
-
 def drawCursor(mainFont, cursorRect, displaySurf):
     cursor = mainFont.render('l', True, WHITE, WHITE)
     displaySurf.blit(cursor, cursorRect)
-
 
 def getInput(windowWidth, windowHeight, buttons, changelvl, mainList, lvlActors, deltaTime, displaySurf):
     newChar = False
@@ -613,14 +629,12 @@ def getInput(windowWidth, windowHeight, buttons, changelvl, mainList, lvlActors,
 
     # Estas funciones basicamente envuelven lo que es el cursor
 
-
 def getStringRect(string, lineNumber, camerax, cameray):
     stringRect = string.get_rect()
     stringRect.x = STARTX - camerax
     stringRect.y = round(STARTY + (lineNumber * (TEXTHEIGHT + (TEXTHEIGHT / 4))) - cameray)
 
     return stringRect
-
 
 def getStringAtInsertPoint(mainList, lineNumber, insertPoint):
     string = mainList[lineNumber]
@@ -630,7 +644,6 @@ def getStringAtInsertPoint(mainList, lineNumber, insertPoint):
 
     return newString
 
-
 def getStringAfterInsertPoint(mainList, lineNumber, insertPoint):
     string = mainList[lineNumber]
     stringList = list(string)
@@ -638,7 +651,6 @@ def getStringAfterInsertPoint(mainList, lineNumber, insertPoint):
     newString = ''.join(newStringList)
 
     return newString
-
 
 def getStringRectAtInsertPoint(mainList, lineNumber, insertPoint, mainFont, camerax, cameray):
     string = getStringAtInsertPoint(mainList, lineNumber, insertPoint)
@@ -649,7 +661,6 @@ def getStringRectAtInsertPoint(mainList, lineNumber, insertPoint, mainFont, came
 
     # funciones de utilidad
 
-
 def getCursorRect(cursorX, cursorY, mainFont, camerax, cameray):
     cursor = mainFont.render('L', True, RED)
     cursorRect = cursor.get_rect()
@@ -657,7 +668,6 @@ def getCursorRect(cursorX, cursorY, mainFont, camerax, cameray):
     cursorRect.y = round(cursorY - cameray)
 
     return cursorRect
-
 
 def displayInfo(insertPoint, mainFont, cursorRect, camerax, windowWidth, windowHeight, displaySurf):
     number = mainFont.render(str(insertPoint), True, TEXTCOLOR, BGCOLOR)

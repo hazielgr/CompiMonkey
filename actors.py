@@ -1,10 +1,20 @@
 import pygame
+import time
+
+monkeyright_sprite = pygame.image.load('resources/sprites/Mona/MonaDer.png')
+monkeyright_sprite = pygame.transform.scale(monkeyright_sprite, (100, 100))
+rat_sprite = pygame.image.load('resources/sprites/rat.png')
+rat_sprite = pygame.transform.scale(rat_sprite, (100, 100))
 
 banana_sprite = pygame.image.load('resources/sprites/jungle_banana_icon.png')
 pad_sprite = pygame.image.load('resources/sprites/leaf.png')
 banana_sprite = pygame.transform.scale(banana_sprite, (100, 100))
+match_sprite = pygame.image.load('resources/sprites/match.png')
+match_sprite = pygame.transform.scale(match_sprite, (100, 100))
 monkeyright_sprite = pygame.image.load('resources/sprites/Mona/MonaDer.png')
 monkeyright_sprite = pygame.transform.scale(monkeyright_sprite, (100, 100))
+coco_sprite = pygame.image.load('resources/sprites/coco/cocoL.png')
+coco_sprite = pygame.transform.scale(coco_sprite, (300, 100))
 
 
 class Banana:
@@ -15,12 +25,25 @@ class Banana:
         self.posy = posy
         self.hitbox = (posx, posy, 100, 100)
 
-
-class Monkey:
+class Match:
 
     def __init__(self, posx, posy):
+        self.sprite = match_sprite
+        self.posx = posx
+        self.posy = posy
+        self.hitbox = (posx, posy, 100, 100)
+
+
+class Monkey:
+    def __init__(self, posx, posy, sprite):
         self.direction = "up"
-        self.sprite = monkeyright_sprite
+        self.id = sprite
+        #pa saber si tiene match o no
+        self.holding= False
+        if self.id == "Rat":
+            self.sprite = rat_sprite
+        else:
+            self.sprite = monkeyright_sprite
         self.score = 0
         self.posx = posx
         self.posy = posy
@@ -41,14 +64,69 @@ class Monkey:
 
     def turn(self, direction):
         self.direction = direction
-        if direction == "right":
-            self.sprite = monkeyright_sprite
-        elif direction == "left":
-            self.sprite = monkeyright_sprite
-        elif direction == "up":
-            self.sprite = monkeyright_sprite
-        elif direction == "down":
-            self.sprite = monkeyright_sprite
+        if self.id == "Monkey":
+            if direction == "right":
+                self.sprite = monkeyright_sprite
+            elif direction == "left":
+                self.sprite = monkeyright_sprite
+            elif direction == "up":
+                self.sprite = monkeyright_sprite
+            elif direction == "down":
+                self.sprite = monkeyright_sprite
+        elif self.id == "Rat":
+            self.sprite = rat_sprite
+
+
+class Coco:
+    def __init__(self, posx, posy):
+        self.sprite = coco_sprite
+        self.posx = posx
+        self.posy = posy
+        #Centro del cuerpo
+        self.posxC = posx+100
+        self.posyC = posy+100
+        self.dir = "left"
+        self.hitbox = (posx, posy, 300, 100)
+        self.mountable = False
+
+    def rotateCoco (self, monkeX, monkeY):
+        if monkeX<self.posxC and monkeY <self.posyC:
+            #mono arriba a la izq
+            self.dir = "up"
+        elif monkeX>self.posxC and monkeY <self.posyC:
+            #mono arriba a la der
+            self.dir = "up"
+        elif monkeX==self.posxC and monkeY <self.posyC:
+            #mono arriba
+            self.dir = "up"
+        elif monkeX<self.posxC and monkeY == self.posyC:
+            #mono a la izq
+            self.dir = "left"
+        elif monkeX>self.posxC and monkeY ==self.posyC:
+            #mono a la der
+            self.dir = "right"
+        elif monkeX<self.posxC and monkeY > self.posyC:
+            #mono abajo a la izq
+            self.dir = "down"
+        elif monkeX>self.posxC and monkeY >self.posyC:
+            #mono abajo a la der
+            self.dir = "down"
+        elif monkeX == self.posxC and monkeY > self.posyC:
+            # mono abajo
+            self.dir = "down"
+        else:
+            #mono en el centro del mop
+            self.dir = self.dir
+    def rotateDir (self):
+        if self.dir == "left" or self == "right":
+            self.posx -=100
+            self.posy +=100
+            self.hitbox = (self.posx,self.posy, 300, 100)
+        elif self.dir =="up" or self.dir == "down":
+            self.posx +=100
+            self.posy -=100
+            self.hitbox = (self.posx,self.posy, 100, 300)
+            self.sprite = pygame.transform.scale(coco_sprite, (100, 300))
 
 
 class Pad:

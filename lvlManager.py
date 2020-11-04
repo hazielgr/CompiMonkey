@@ -1,5 +1,5 @@
 from levels import *
-from main import banana_sprite, monkeyhead_sprite
+#from main import banana_sprite, monkeyhead_sprite
 
 
 def levelManager(lvl):
