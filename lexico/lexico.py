@@ -56,6 +56,7 @@ T_NEWLINE	   =       'NEWLINE'
 T_COMA         =       'COMA'
 T_FLECHA	   =       'FLECHA'
 T_PUNTO        =       'PUNTO'
+T_TAB          =       'TAB'
 
 KEYWORDS = [
     'and' , 'or' , 'not', 'if', 'else','times','for','in','until','return'
@@ -147,6 +148,9 @@ class Lexico:
             elif self.current_char == ',':
                 tokens.append(Token(T_COMA, pos_start=self.pos))
                 self.move()
+            elif self.current_char == '_':
+                tokens.append(Token(T_TAB, pos_start=self.pos))
+                self.move()
             else:
                 pos_start= self.pos.copy()
                 character=self.current_char
@@ -173,7 +177,7 @@ class Lexico:
     def make_identificador(self):
         id_string = ''
         pos_start = self.pos.copy()
-        while self.current_char != None and self.current_char in LETRAS_SPECIALES + '_':
+        while self.current_char != " " and self.current_char in LETRAS_SPECIALES + '_':
             id_string += self.current_char
             self.move()
         token_type = T_KEYWORD if id_string in KEYWORDS else T_IDENTIFICADOR

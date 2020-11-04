@@ -1,6 +1,6 @@
 statements      : NEWLINE* expr (NEWLINE+ expr)* NEWLINE*
 
-expr            : IDENTIFICADOR EQ expr
+expr            : TAB IDENTIFICADOR EQ expr
 				: comp_expr ((KEYWORD:AND|KEYWORD:OR) comp_expr)*
 
 comp_expr		: NOT comp_expr
@@ -24,9 +24,9 @@ atom 		    : ENTERO|DECIMAL|IDENTIFICADOR
 list-expr       : RECIZQ (expr (COMA expr)*)? RECTDER
 
 if-expr         : KEYWORD:if expr
-                  (NEWLINE statements)
+                  (NEWLINE expr)
                   KEYWORD:else
-                  (NEWLINE statements)
+                  (NEWLINE expr)
 
 for-expr    : KEYWORD:FOR IDENTIFIER EQ expr KEYWORD:in expr
               (NEWLINE statements)

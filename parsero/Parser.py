@@ -137,29 +137,28 @@ class Parser:
         return res.failure(InvalidSyntaxError(token.pos_start, token.pos_end,"Expected int, float, identifier, '+', '-', '(', '[', 'if','for','until'"))
     def expr(self):
         res = ParseResult()
-        if self.current_token.type == T_IDENTIFICADOR:
-            variable_name = self.current_token
+        if self.current_token.type == T_TAB:
             res.register_move()
             self.move()
-            if self.current_token.type == T_IGUAL:
-                res.register_move()
-                self.move()
-                if self.current_token.type == T_PARENTIZQ:
-                    func_def = res.register(self.func_def(variable_name))
-                    if res.error: return res
-                    return res.success(func_def)
-                expr = res.register(self.expr())
-                if res.error: return res
-                return res.success(VarAssignNode(variable_name, expr))
-            if self.current_token.type == T_PUNTO:
-                res.register_move()
-                self.move()
-            return res.success(VarAccessNode(variable_name))
-
-        node = res.register(self.bin_operation(self.comp_expr, ((T_KEYWORD, "and"), (T_KEYWORD, 'or'))))
+            if self.current_token.type != T_IDENTIFICADOR:
+                return res.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,"Expected IDENTIFICADOR"))
+            var_name = self.current_token
+            res.register_move()
+            self.move()
+            if self.current_token.type != T_IGUAL:
+                return res.failure(
+                    InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end, "Expected '='"))
+            res.register_move()
+            self.move()
+            expr = res.register(self.expr())
+            if res.error: return res
+            return res.success(VarAssignNode(var_name, expr))
+        node = res.register(self.bin_operation(self.comp_expr, ((T_KEYWORD, 'and'), (T_KEYWORD, 'or'))))
         if res.error:
-            return res.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,"Expected 'if','for','until', int, float, identifier, '+', '-' or '('"))
+            return res.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,
+                                                  "Expected 'TAB', 'if', 'for', 'until', int, float, identificador, '+', '-', '(', '[' or 'not'"))
         return res.success(node)
+
     def comp_expr(self):
         res = ParseResult()
         if self.current_token.matches(T_KEYWORD, 'not'):
@@ -227,51 +226,39 @@ class Parser:
             if res.error: return res
             return res.success(UnaryOpNode(token, factor))
         return self.power()
-    def if_expr(self):
-        res = ParseResult()
-        all_cases = res.register(self.if_expr_cases('if'))
-        if res.error: return res
-        cases, else_case = all_cases
-        return res.success(IfNode(cases, else_case))
 
-    def if_expr_cases(self, case_keyword):
+    def if_expr(self):
         res = ParseResult()
         cases = []
         else_case = None
-
-        if not self.current_token.matches(T_KEYWORD, case_keyword):
-            return res.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,f"Expected '{case_keyword}'"))
+        if not self.current_token.matches(T_KEYWORD, 'if'):
+            return res.failure(
+                InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end, f"Expected 'if'"))
         res.register_move()
         self.move()
-
         condition = res.register(self.expr())
         if res.error: return res
+
+        if not self.current_token.type == T_NEWLINE:
+            return res.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end, f"Expected 'NEWLINE'"))
         res.register_move()
         self.move()
-
-        if self.current_token.type != T_NEWLINE:
-            return res.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end,f"Expected NEWLINE"))
-        res.register_move()
-        self.move()
-
-        statements = res.register(self.statements())
+        expr = res.register(self.expr())
         if res.error: return res
-        cases.append((condition, statements, True))
-
-        if self.current_token.type != T_NEWLINE:
-            return res.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end, f"Expected NEWLINE"))
+        cases.append((condition, expr))
         res.register_move()
         self.move()
-
         if self.current_token.matches(T_KEYWORD, 'else'):
             res.register_move()
             self.move()
-
-            expr = res.register(self.statement())
+            if not self.current_token.type == T_NEWLINE:
+                return res.failure(InvalidSyntaxError(self.current_token.pos_start, self.current_token.pos_end, f"Expected 'NEWLINE'"))
+            res.register_move()
+            self.move()
+            else_case = res.register(self.expr())
             if res.error: return res
+        return res.success(IfNode(cases, else_case))
 
-        cases.append((condition, expr, False))
-        return res.success((cases, else_case))
     def for_expr(self):
         res = ParseResult()
         if not self.current_token.matches(T_KEYWORD, 'for'):
