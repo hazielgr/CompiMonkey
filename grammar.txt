@@ -1,0 +1,37 @@
+statements      : NEWLINE* expr (NEWLINE+ expr)* NEWLINE*
+
+expr            : TAB IDENTIFICADOR EQ expr
+				: comp_expr ((KEYWORD:AND|KEYWORD:OR) comp_expr)*
+
+comp_expr		: NOT comp_expr
+				: arith_expr ((COMP_EQUAL|COMP_MENORQUE|COMP_MAYORQUE|COMP_MENORIGUAL|COMP_MAYORIGUAL) arith_expr)*
+
+arith-expr	    : term ((SUMA|RESTA) term)*
+
+term            : factor ((MULTIPLICA|DIVIDE) factor)*
+
+factor	        : (SUMA|RESTA) factor
+				: power
+
+power		    : call (POW factor)*
+
+call            : atom (LPAREN (expr (COMMA expr)*)? RPAREN)?
+
+atom 		    : ENTERO|DECIMAL|IDENTIFICADOR
+				: PARENTIZQ expr PARENTDER
+				: if-expr
+
+list-expr       : RECIZQ (expr (COMA expr)*)? RECTDER
+
+if-expr         : KEYWORD:if expr
+                  (NEWLINE expr)
+                  KEYWORD:else
+                  (NEWLINE expr)
+
+for-expr    : KEYWORD:FOR IDENTIFIER EQ expr KEYWORD:in expr
+              (NEWLINE statements)
+
+until-expr  : KEYWORD:until expr
+              (NEWLINE statements)
+
+
