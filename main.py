@@ -3,6 +3,7 @@ from pygame.locals import *
 from levels import level1
 from lvlManager import *
 from button import *
+from interprete.interpreter import *
 
 ## CONSTANTES ##
 
@@ -616,7 +617,19 @@ def getInput(windowWidth, windowHeight, buttons, changelvl, mainList, lvlActors,
                                 mainListString += mainListaux[i]
                         print(mainList)
                         print(mainListaux)
+                        #########################
                         print(mainListString)
+                        text = mainListString
+                        if text.strip() == "": continue
+                        result, error = run('<stdin>', text)
+                        if error:
+                            print(error.as_string())
+                        elif result:
+                            if len(result.elements) == 1:
+                                print(repr(result.elements[0]))
+                            else:
+                                print(repr(result))
+                        #########################
                     elif buttons[i].lvl == 11:
                         mainList = [""]
                     else:
