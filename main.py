@@ -1,9 +1,11 @@
-import pygame, sys, math,threading
+import pygame, sys, math, threading
 from pygame.locals import *
 from levels import level1
 from lvlManager import *
 from button import *
 from interprete.interpreter import *
+import funciones
+import config
 
 ## CONSTANTES ##
 
@@ -38,20 +40,18 @@ DARKCREAM = (255, 242, 180)
 BGCOLOR = GRAY
 TEXTCOLOR = WHITE
 
-#icon = pygame.image.load('resources/sprites/monkey_head_icon.png')
+# icon = pygame.image.load('resources/sprites/monkey_head_icon.png')
 ##monkeyhead_sprite = pygame.image.load('resources/sprites/monkey_head_icon.png')
 banana_sprite = pygame.image.load('resources/sprites/jungle_banana_icon.png')
-
-
+match_sprite = pygame.image.load('resources/sprites/match.png')
 
 buttons = []
 buttonx = 0
 buttony = 850
-lvlActors = []
-displaySurf = pygame.display.set_mode((1600, 900), RESIZABLE)
 
-def main():
-    global FPSCLOCK, displaySurf, lvlActors
+
+def runGame():
+    global FPSCLOCK, displaySurf, lvlActors, currentlvl
     move_monkey = False
 
     lvlActors = []
@@ -109,14 +109,14 @@ def main():
 
     cursorRect = getCursorRect(STARTX, STARTY + (TEXTHEIGHT + (TEXTHEIGHT / 4)), mainFont, camerax, cameray)
 
-    def moveleaf():
-        if len(lvlActors) != 0:
-            monkey = lvlActors[0]
-            if lvlActors[3]!= []:
-                deltaTime
-                lvlActors[3][0].movingpad()
-                if lvlActors[3][0].mounted:
-                    monkey.posx = lvlActors[3][0].posx
+    # def moveleaf():
+    # if len(lvlActors) != 0:
+    # monkey = lvlActors[0]
+    # if lvlActors[3] != []:
+    # deltaTime
+    # lvlActors[3][0].movingpad()
+    # if lvlActors[3][0].mounted:
+    # monkey.posx = lvlActors[3][0].posx
 
     # El loop del juego detecta el input del usuario y lo muestra en pantalla
     # coloca el cursor en la pantalla y ajusta la camara de ser necesario
@@ -140,6 +140,7 @@ def main():
         # level manager
         if currentlvl != changelvl:
             lvlActors = levelManager(changelvl)
+            changeConfigList(lvlActors, displaySurf)
             currentlvl = changelvl
 
         blitLevel(lvlActors, displaySurf, grid)
@@ -148,15 +149,50 @@ def main():
         for i in range(len(buttons)):
             buttons[i].draw(displaySurf)
 
-        #moveleaf()
+        # moveleaf()
 
-        checkCollision(lvlActors)
-
-
+        checkCollision(lvlActors, currentlvl)
 
         score(displaySurf, lvlActors)
         pygame.display.update()
         FPSCLOCK.tick(FPS)
+
+
+# FUNCIONES QUE VA A UTILIZAR EL INTERPRETE
+##########
+
+def step(num):
+    contador = 1
+    step = 1
+    # loop que hace al mono moverse la cantidad de veces indicadas por el usuario
+    while contador <= num:
+        if lvlActors[8][2] == "desert":
+            pygame.draw.rect(displaySurf, DESERT, (lvlActors[0].posx, lvlActors[0].posy, 99, 99))
+        else:
+            pygame.draw.rect(displaySurf, GREEN, (lvlActors[0].posx, lvlActors[0].posy, 99, 99))
+        # cambia las posiciones posx y posy del mono
+        lvlActors[0].step(step)
+        # actualiza el hitbox y dibuja el mono en sus nuevas posiciones
+        lvlActors[0].hitbox = (lvlActors[0].posx, lvlActors[0].posy, 100, 100)
+        displaySurf.blit(lvlActors[0].sprite, (lvlActors[0].posx, lvlActors[0].posy))
+        # se cambia el valor del booleano por efectos de colisiones
+        lvlActors[0].move = True
+        contador += 1
+        pygame.time.wait(50)
+        checkCollision(lvlActors, currentlvl)
+        if lvlActors[0].move == False:
+            contador = num
+        pygame.display.update()
+
+
+###########
+
+def changeConfigList(lvlActors, displaySurf):
+    print("largo lista " + str(len(lvlActors)))
+    config.lvlActors.clear()
+    for i in range(len(lvlActors)):
+        config.lvlActors.append(lvlActors[i])
+    config.displaySurf = displaySurf
 
 
 # Interpreta el input y cambia el mainList, lineNumber, insertPoint y el cursorRect.
@@ -356,8 +392,12 @@ def distanceTo(actor, lvlActors):
 
 def score(displaySurf, lvlActors):
     banana_aux = pygame.transform.scale(banana_sprite, (92, 64))
+    match_aux = pygame.transform.scale(match_sprite, (185, 150))
+    if currentlvl == 4 or currentlvl == 5:
+        displaySurf.blit(match_aux, (-45, -25))
+    else:
+        displaySurf.blit(banana_aux, (0, 0))
 
-    displaySurf.blit(banana_aux, (0, 0))
     scoreFont = pygame.font.SysFont('Lucida Console', 60)
     if len(lvlActors) != 0:
         text = scoreFont.render("x" + str(lvlActors[2]), True, WHITE)
@@ -366,17 +406,22 @@ def score(displaySurf, lvlActors):
     displaySurf.blit(text, (100, 7))
 
 
-def checkCollision(lvlActors):
+def checkCollision(lvlActors, currentlvl):
+    index = 1
     mapsurface = lvlActors[8:]
     if len(lvlActors) != 0:
         monkey = lvlActors[0]
-        for banana in range(len(lvlActors[1])):
-            if monkey.posy < lvlActors[1][banana].hitbox[1] + lvlActors[1][banana].hitbox[3] and monkey.posy + \
-                    monkey.hitbox[3] > lvlActors[1][banana].hitbox[1]:
-                if monkey.posx + monkey.hitbox[2] > lvlActors[1][banana].hitbox[0] and monkey.posx < \
-                        lvlActors[1][banana].hitbox[0] + lvlActors[1][banana].hitbox[2]:
+
+        if currentlvl == 4 or currentlvl == 5:
+            index = 4
+
+        for item in range(len(lvlActors[index])):
+            if monkey.posy < lvlActors[index][item].hitbox[1] + lvlActors[index][item].hitbox[3] and monkey.posy + \
+                    monkey.hitbox[3] > lvlActors[index][item].hitbox[1]:
+                if monkey.posx + monkey.hitbox[2] > lvlActors[index][item].hitbox[0] and monkey.posx < \
+                        lvlActors[index][item].hitbox[0] + lvlActors[index][item].hitbox[2]:
                     lvlActors[2] += 1
-                    lvlActors[1].pop(banana)
+                    lvlActors[index].pop(item)
 
         for pad in range(len(lvlActors[3])):
             if monkey.posy < lvlActors[3][pad].hitbox[1] + lvlActors[3][pad].hitbox[3] and monkey.posy + \
@@ -514,32 +559,11 @@ def adjustCamera(mainList, lineNumber, insertPoint, cursorRect, mainFont, camera
 
     return camerax, cameray
 
-def step(num):
-    contador = 1
-    step = 1
-    # loop que hace al mono moverse la cantidad de veces indicadas por el usuario
-    while contador <= num:
-        if lvlActors[8][2] == "desert":
-            pygame.draw.rect(displaySurf, DESERT, (lvlActors[0].posx, lvlActors[0].posy, 99, 99))
-        else:
-            pygame.draw.rect(displaySurf, GREEN, (lvlActors[0].posx, lvlActors[0].posy, 99, 99))
-        # cambia las posiciones posx y posy del mono
-        lvlActors[0].step(step)
-        # actualiza el hitbox y dibuja el mono en sus nuevas posiciones
-        lvlActors[0].hitbox = (lvlActors[0].posx, lvlActors[0].posy, 100, 100)
-        displaySurf.blit(lvlActors[0].sprite, (lvlActors[0].posx, lvlActors[0].posy))
-        # se cambia el valor del booleano por efectos de colisiones
-        lvlActors[0].move = True
-        contador += 1
-        pygame.time.wait(50)
-        checkCollision(lvlActors)
-        if lvlActors[0].move == False:
-            contador = num
-        pygame.display.update()
 
 def drawCursor(mainFont, cursorRect, displaySurf):
     cursor = mainFont.render('l', True, WHITE, WHITE)
     displaySurf.blit(cursor, cursorRect)
+
 
 def getInput(windowWidth, windowHeight, buttons, changelvl, mainList, lvlActors, deltaTime, displaySurf):
     newChar = False
@@ -560,7 +584,7 @@ def getInput(windowWidth, windowHeight, buttons, changelvl, mainList, lvlActors,
         elif event.type == KEYDOWN:
             if event.key == K_BACKSPACE:
                 deleteKey = True
-                step(3)
+                step(1)
             elif event.key == K_ESCAPE:
                 newChar = 'escape'
             elif event.key == K_RETURN:
@@ -580,14 +604,6 @@ def getInput(windowWidth, windowHeight, buttons, changelvl, mainList, lvlActors,
             elif event.key == K_DOWN:
                 directionKey = DOWN
                 lvlActors[0].direction = "down"
-            # elif event.key == K_LCTRL:
-            #   if len(lvlActors) != 0:
-            #      if lvlActors[3][0].mounted:
-            #         lvlActors[3][0].mounted = False
-            #    if lvlActors[0].move:
-            #       lvlActors[0].posy += 20
-            # els
-            #     lvlActors[0].move = True
             else:
                 newChar = event.unicode
                 typeChar = True
@@ -617,6 +633,7 @@ def getInput(windowWidth, windowHeight, buttons, changelvl, mainList, lvlActors,
                                 mainListString += mainListaux[i]
                         print(mainList)
                         print(mainListaux)
+
                         #########################
                         print(mainListString)
                         text = mainListString
@@ -642,12 +659,14 @@ def getInput(windowWidth, windowHeight, buttons, changelvl, mainList, lvlActors,
 
     # Estas funciones basicamente envuelven lo que es el cursor
 
+
 def getStringRect(string, lineNumber, camerax, cameray):
     stringRect = string.get_rect()
     stringRect.x = STARTX - camerax
     stringRect.y = round(STARTY + (lineNumber * (TEXTHEIGHT + (TEXTHEIGHT / 4))) - cameray)
 
     return stringRect
+
 
 def getStringAtInsertPoint(mainList, lineNumber, insertPoint):
     string = mainList[lineNumber]
@@ -657,6 +676,7 @@ def getStringAtInsertPoint(mainList, lineNumber, insertPoint):
 
     return newString
 
+
 def getStringAfterInsertPoint(mainList, lineNumber, insertPoint):
     string = mainList[lineNumber]
     stringList = list(string)
@@ -664,6 +684,7 @@ def getStringAfterInsertPoint(mainList, lineNumber, insertPoint):
     newString = ''.join(newStringList)
 
     return newString
+
 
 def getStringRectAtInsertPoint(mainList, lineNumber, insertPoint, mainFont, camerax, cameray):
     string = getStringAtInsertPoint(mainList, lineNumber, insertPoint)
@@ -674,6 +695,7 @@ def getStringRectAtInsertPoint(mainList, lineNumber, insertPoint, mainFont, came
 
     # funciones de utilidad
 
+
 def getCursorRect(cursorX, cursorY, mainFont, camerax, cameray):
     cursor = mainFont.render('L', True, RED)
     cursorRect = cursor.get_rect()
@@ -681,6 +703,7 @@ def getCursorRect(cursorX, cursorY, mainFont, camerax, cameray):
     cursorRect.y = round(cursorY - cameray)
 
     return cursorRect
+
 
 def displayInfo(insertPoint, mainFont, cursorRect, camerax, windowWidth, windowHeight, displaySurf):
     number = mainFont.render(str(insertPoint), True, TEXTCOLOR, BGCOLOR)
@@ -765,4 +788,4 @@ def getStringRenderAndRect(string, mainFont):
 
 
 if __name__ == '__main__':
-    main()
+    runGame()
