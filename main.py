@@ -140,7 +140,7 @@ def runGame():
         # level manager
         if currentlvl != changelvl:
             lvlActors = levelManager(changelvl)
-            changeConfigList(lvlActors, displaySurf)
+            changeConfigList(lvlActors, displaySurf, currentlvl)
             currentlvl = changelvl
 
         blitLevel(lvlActors, displaySurf, grid)
@@ -153,7 +153,7 @@ def runGame():
 
         checkCollision(lvlActors, currentlvl)
 
-        score(displaySurf, lvlActors)
+        score(displaySurf, config.lvlActors)
         pygame.display.update()
         FPSCLOCK.tick(FPS)
 
@@ -161,7 +161,7 @@ def runGame():
 # FUNCIONES QUE VA A UTILIZAR EL INTERPRETE
 ##########
 
-def step(num):
+def step(num, lvlActors, displaySurf, currentlvl):
     contador = 1
     step = 1
     # loop que hace al mono moverse la cantidad de veces indicadas por el usuario
@@ -174,11 +174,11 @@ def step(num):
         lvlActors[0].step(step)
         # actualiza el hitbox y dibuja el mono en sus nuevas posiciones
         lvlActors[0].hitbox = (lvlActors[0].posx, lvlActors[0].posy, 100, 100)
-        displaySurf.blit(lvlActors[0].sprite, (lvlActors[0].posx, lvlActors[0].posy))
+        displaySurf.blit(lvlActors[0].sprite, (lvlActors[0].posx, lvlActors[0].posy-10))
         # se cambia el valor del booleano por efectos de colisiones
         lvlActors[0].move = True
         contador += 1
-        pygame.time.wait(50)
+        pygame.time.wait(200)
         checkCollision(lvlActors, currentlvl)
         if lvlActors[0].move == False:
             contador = num
@@ -187,12 +187,13 @@ def step(num):
 
 ###########
 
-def changeConfigList(lvlActors, displaySurf):
+def changeConfigList(lvlActors, displaySurf, currentelvl):
     print("largo lista " + str(len(lvlActors)))
     config.lvlActors.clear()
     for i in range(len(lvlActors)):
         config.lvlActors.append(lvlActors[i])
     config.displaySurf = displaySurf
+    config.currentlvl = currentlvl
 
 
 # Interpreta el input y cambia el mainList, lineNumber, insertPoint y el cursorRect.
@@ -485,9 +486,9 @@ def blitLevel(lvlActors, displaySurf, grid):
             displaySurf.blit(lvlActors[3][pad].sprite, (lvlActors[3][pad].posx, lvlActors[3][pad].posy))
             pygame.draw.rect(displaySurf, BLACK, lvlActors[3][pad].hitbox, 2)
         # monkey y su hitbox
-        displaySurf.blit(lvlActors[0].sprite, (lvlActors[0].posx, lvlActors[0].posy))
+        displaySurf.blit(lvlActors[0].sprite, (lvlActors[0].posx, lvlActors[0].posy - 10))
         pygame.draw.rect(displaySurf, BLACK, lvlActors[0].hitbox, 2)
-        lvlActors[0].hitbox = (lvlActors[0].posx + 0, lvlActors[0].posy + 0, 100, 100)
+        lvlActors[0].hitbox = (lvlActors[0].posx + 0, lvlActors[0].posy, 100, 100)
 
         # bananas y sus hitboxes
         for banana in range(len(lvlActors[1])):
@@ -584,7 +585,6 @@ def getInput(windowWidth, windowHeight, buttons, changelvl, mainList, lvlActors,
         elif event.type == KEYDOWN:
             if event.key == K_BACKSPACE:
                 deleteKey = True
-                step(1)
             elif event.key == K_ESCAPE:
                 newChar = 'escape'
             elif event.key == K_RETURN:

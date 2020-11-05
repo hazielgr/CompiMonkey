@@ -4,6 +4,8 @@ from interprete.Context import Context
 from parsero.Parser import *
 from lexico.Lexer import *
 from errores.errorHandler import *
+import main
+import config
 import os
 import math
 ##########################################################
@@ -689,6 +691,7 @@ class BuiltInFunction(BaseFunction):
     def execute_step(self, exec_ctx):
         is_number = isinstance(exec_ctx.symbol_table.get("value"), Number)
         if(is_number):
+            main.step(int(str(exec_ctx.symbol_table.get("value"))), config.lvlActors, config.displaySurf, config.currentlvl)
             print("Monito camina la siguiente cantidad de pasos: " + str(exec_ctx.symbol_table.get("value")))
             return RTResult().success(Number(exec_ctx.symbol_table.get("value")))
         else:
@@ -698,13 +701,9 @@ class BuiltInFunction(BaseFunction):
     def execute_turnTo(self, exec_ctx):
         is_string = isinstance(exec_ctx.symbol_table.get("value"), String)
         if(is_string):
+            config.lvlActors[0].direction = str(exec_ctx.symbol_table.get("value"))
             print(exec_ctx.symbol_table.get("value"))
-            if(str(exec_ctx.symbol_table.get("value")) == 'right' or str(exec_ctx.symbol_table.get("value")) == 'left' ):
-                print("Monito rota hacia: " + str(exec_ctx.symbol_table.get("value")))
-                return RTResult().success(Number.true)
-            else:
-                return RTResult().failure(
-                    RTError(self.pos_start, self.pos_end, "El argumento esta incorrecto", exec_ctx))
+            return RTResult().success(Number.true)
         else:
             return RTResult().failure(RTError(self.pos_start, self.pos_end,"El argumento esta incorrecto",exec_ctx))
     execute_turnTo.arg_names = ["value"]

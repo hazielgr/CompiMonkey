@@ -1,6 +1,6 @@
 import pygame, sys, math, threading
 import config
-from main import checkCollision
+
 
 GREEN = (41, 171, 13)
 DESERT = (235, 226, 209)
