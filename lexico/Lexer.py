@@ -116,6 +116,7 @@ KEYWORDS = [
     'RETURN',
     'CONTINUE',
     'BREAK',
+    'times'
 ]
 
 
@@ -211,6 +212,9 @@ class Lexer:
                 tokens.append(self.make_greater_than())
             elif self.current_char == ',':
                 tokens.append(Token(TT_COMMA, pos_start=self.pos))
+                self.advance()
+            elif self.current_char == '.':
+                tokens.append(Token(TT_PUNTO, pos_start=self.pos))
                 self.advance()
             else:
                 pos_start = self.pos.copy()
@@ -412,7 +416,15 @@ class UnaryOpNode:
 
     def __repr__(self):
         return f'({self.op_tok}, {self.node})'
+    
+class TimesNode:
+    def __init__(self, repetitions_node, sentences_node,should_return_null):
+        self.number_node = repetitions_node
+        self.body_node = sentences_node
 
+        self.should_return_null = should_return_null
+        self.pos_start = self.number_node.pos_start
+        self.pos_end = self.body_node.pos_end
 
 class IfNode:
     def __init__(self, cases, else_case):
