@@ -269,6 +269,11 @@ class Parser:
             if_expr = res.register(self.if_expr())
             if res.error: return res
             return res.success(if_expr)
+        
+         elif tok.matches(TT_KEYWORD, 'times'): 
+            times_expr = res.register(self.times_expr()) 
+            if res.error: return res 
+            return res.success(times_expr) 
 
         elif tok.matches(TT_KEYWORD, 'FOR'):
             for_expr = res.register(self.for_expr())
@@ -289,6 +294,40 @@ class Parser:
             tok.pos_start, tok.pos_end,
             "Expected int, float, identifier, '+', '-', '(', '[', IF', 'FOR', 'WHILE', 'def'"
         ))
+    
+    def times_expr(self): 
+        res = ParseResult() 
+        if not self.current_tok.matches(TT_KEYWORD, 'times'): 
+            return res.failure(InvalidSyntaxError(self.current_tok.pos_start, self.current_tok.pos_end,"Expected 'times' ")) 
+        res.register_advancement() 
+        self.advance() 
+        if self.current_tok.type != TT_PUNTO: 
+            return res.failure(InvalidSyntaxError(self.current_tok.pos_start, self.current_tok.pos_end,"Expected '.' ")) 
+        res.register_advancement() 
+        self.advance() 
+ 
+        number = self.current_tok 
+        res.register_advancement() 
+        self.advance() 
+ 
+        if self.current_tok.type != TT_ARROW: 
+            return res.failure( 
+                InvalidSyntaxError(self.current_tok.pos_start, self.current_tok.pos_end, "Expected '->'")) 
+        res.register_advancement() 
+        self.advance() 
+ 
+        if self.current_tok.type != TT_NEWLINE: 
+            return res.failure( 
+                InvalidSyntaxError(self.current_tok.pos_start, self.current_tok.pos_end, "Expected 'NewLine'")) 
+        res.register_advancement() 
+        self.advance() 
+ 
+        body = res.register(self.expr()) 
+        if res.error: return res 
+        res.register_advancement() 
+        self.advance() 
+ 
+        return res.success(TimesNode(number, body,False))
 
     def list_expr(self):
         res = ParseResult()
