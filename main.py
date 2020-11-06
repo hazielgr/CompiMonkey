@@ -109,15 +109,6 @@ def runGame():
 
     cursorRect = getCursorRect(STARTX, STARTY + (TEXTHEIGHT + (TEXTHEIGHT / 4)), mainFont, camerax, cameray)
 
-    # def moveleaf():
-    # if len(lvlActors) != 0:
-    # monkey = lvlActors[0]
-    # if lvlActors[3] != []:
-    # deltaTime
-    # lvlActors[3][0].movingpad()
-    # if lvlActors[3][0].mounted:
-    # monkey.posx = lvlActors[3][0].posx
-
     # El loop del juego detecta el input del usuario y lo muestra en pantalla
     # coloca el cursor en la pantalla y ajusta la camara de ser necesario
 
@@ -148,8 +139,6 @@ def runGame():
         # dibuja los botones
         for i in range(len(buttons)):
             buttons[i].draw(displaySurf)
-
-        # moveleaf()
 
         checkCollision(lvlActors, currentlvl)
 
@@ -184,8 +173,28 @@ def step(num, lvlActors, displaySurf, currentlvl):
             contador = num
         pygame.display.update()
 
+def distanceToX(actor, lvlActors):
+    distanceX = abs(lvlActors[0].posx - actor.posx)
+    return int(distanceX/100)
+
+def distanceToY(actor, lvlActors):
+    distanceY = abs(lvlActors[0].posy - actor.posy)
+    return int(distanceY/100)
+
+def cerca(actor, lvlActors):
+    if actor.posx == lvlActors[0].posx and actor.posy == lvlActors[0].posy:
+        return True
+    else:
+        return False
+
+def health(lvlActors):
+    return lvlActors[0].health
 
 ###########
+
+def moveleaf(lvlActors):
+    if lvlActors[3][0].mounted:
+        lvlActors[0].posx = lvlActors[3][0].posx
 
 def changeConfigList(lvlActors, displaySurf, currentelvl):
     print("largo lista " + str(len(lvlActors)))
@@ -194,7 +203,6 @@ def changeConfigList(lvlActors, displaySurf, currentelvl):
         config.lvlActors.append(lvlActors[i])
     config.displaySurf = displaySurf
     config.currentlvl = currentlvl
-
 
 # Interpreta el input y cambia el mainList, lineNumber, insertPoint y el cursorRect.
 
@@ -416,13 +424,14 @@ def checkCollision(lvlActors, currentlvl):
         if currentlvl == 4 or currentlvl == 5:
             index = 4
 
-        for item in range(len(lvlActors[index])):
+        for item in range(len(config.lvlActors[index])):
             if monkey.posy < lvlActors[index][item].hitbox[1] + lvlActors[index][item].hitbox[3] and monkey.posy + \
                     monkey.hitbox[3] > lvlActors[index][item].hitbox[1]:
                 if monkey.posx + monkey.hitbox[2] > lvlActors[index][item].hitbox[0] and monkey.posx < \
                         lvlActors[index][item].hitbox[0] + lvlActors[index][item].hitbox[2]:
                     lvlActors[2] += 1
-                    lvlActors[index].pop(item)
+                    config.lvlActors[index].pop(item)
+                    break
 
         for pad in range(len(lvlActors[3])):
             if monkey.posy < lvlActors[3][pad].hitbox[1] + lvlActors[3][pad].hitbox[3] and monkey.posy + \
@@ -430,8 +439,23 @@ def checkCollision(lvlActors, currentlvl):
                 if monkey.posx + monkey.hitbox[2] > lvlActors[3][pad].hitbox[0] and monkey.posx < \
                         lvlActors[3][pad].hitbox[0] + lvlActors[3][pad].hitbox[2]:
                     lvlActors[3][pad].mounted = True
+                    lvlActors[0].mounted = True
             else:
                 lvlActors[3][pad].mounted = False
+                lvlActors[0].mounted = False
+
+        for cocodrilo in range(len(lvlActors[5])):
+            if monkey.posy < lvlActors[5][cocodrilo].hitbox[1] + lvlActors[5][cocodrilo].hitbox[3] and monkey.posy + \
+                    monkey.hitbox[3] > lvlActors[5][cocodrilo].hitbox[1]:
+                if monkey.posx + monkey.hitbox[2] > lvlActors[5][cocodrilo].hitbox[0] and monkey.posx < \
+                        lvlActors[5][cocodrilo].hitbox[0] + lvlActors[5][cocodrilo].hitbox[2]:
+
+                    lvlActors[5][cocodrilo].mounted = True
+                    lvlActors[0].mounted = True
+                    break
+            else:
+                lvlActors[5][cocodrilo].mounted = False
+                lvlActors[0].mounted = False
 
         for i in range(len(mapsurface)):
             if mapsurface[i][2] == "bush":
@@ -446,8 +470,13 @@ def checkCollision(lvlActors, currentlvl):
                         monkey.hitbox[3] > mapsurface[i][1][1]:
                     if monkey.posx + monkey.hitbox[2] > mapsurface[i][1][0] and monkey.posx < \
                             mapsurface[i][1][0] + mapsurface[i][1][2]:
-                        monkey.move = False
-                        collisionDetected(monkey)
+                        if (lvlActors[0].mounted):
+                            print("me monte")
+                            if (lvlActors[3]!=[]):
+                                moveleaf(lvlActors)
+                        else:
+                            monkey.move = False
+                            collisionDetected(monkey)
 
 
 def collisionDetected(monkey):
@@ -485,12 +514,12 @@ def blitLevel(lvlActors, displaySurf, grid):
         for pad in range(len(lvlActors[3])):
             displaySurf.blit(lvlActors[3][pad].sprite, (lvlActors[3][pad].posx, lvlActors[3][pad].posy))
             pygame.draw.rect(displaySurf, BLACK, lvlActors[3][pad].hitbox, 2)
-        # monkey y su hitbox
-        displaySurf.blit(lvlActors[0].sprite, (lvlActors[0].posx, lvlActors[0].posy - 10))
-        pygame.draw.rect(displaySurf, BLACK, lvlActors[0].hitbox, 2)
-        lvlActors[0].hitbox = (lvlActors[0].posx + 0, lvlActors[0].posy, 100, 100)
 
         # bananas y sus hitboxes
+        for coco in range(len(lvlActors[5])):
+            displaySurf.blit(lvlActors[5][coco].sprite, (lvlActors[5][coco].posx, lvlActors[5][coco].posy))
+            pygame.draw.rect(displaySurf, BLACK, lvlActors[5][coco].hitbox, 2)
+
         for banana in range(len(lvlActors[1])):
             displaySurf.blit(lvlActors[1][banana].sprite, (lvlActors[1][banana].posx, lvlActors[1][banana].posy))
             pygame.draw.rect(displaySurf, BLACK, lvlActors[1][banana].hitbox, 2)
@@ -499,9 +528,12 @@ def blitLevel(lvlActors, displaySurf, grid):
             displaySurf.blit(lvlActors[4][match].sprite, (lvlActors[4][match].posx, lvlActors[4][match].posy))
             pygame.draw.rect(displaySurf, BLACK, lvlActors[4][match].hitbox, 2)
 
-        for coco in range(len(lvlActors[5])):
-            displaySurf.blit(lvlActors[5][coco].sprite, (lvlActors[5][coco].posx, lvlActors[5][coco].posy))
-            pygame.draw.rect(displaySurf, BLACK, lvlActors[5][coco].hitbox, 2)
+        # monkey y su hitbox
+        displaySurf.blit(lvlActors[0].sprite, (lvlActors[0].posx, lvlActors[0].posy - 10))
+        pygame.draw.rect(displaySurf, BLACK, lvlActors[0].hitbox, 2)
+        lvlActors[0].hitbox = (lvlActors[0].posx + 0, lvlActors[0].posy, 100, 100)
+
+
 
         # grid
         counterx = 0
@@ -584,6 +616,8 @@ def getInput(windowWidth, windowHeight, buttons, changelvl, mainList, lvlActors,
 
         elif event.type == KEYDOWN:
             if event.key == K_BACKSPACE:
+                if (lvlActors[3]!=[]):
+                    lvlActors[3][0].movingPad(1)
                 deleteKey = True
             elif event.key == K_ESCAPE:
                 newChar = 'escape'
@@ -623,7 +657,6 @@ def getInput(windowWidth, windowHeight, buttons, changelvl, mainList, lvlActors,
                     if buttons[i].lvl == 10:
                         mainListaux = []
                         mainListString = ""
-                        print("RUN")
                         if mainList[0] != "":
                             for i in range(len(mainList)):
                                 mainListaux.append(mainList[i])
@@ -631,11 +664,8 @@ def getInput(windowWidth, windowHeight, buttons, changelvl, mainList, lvlActors,
                                 mainListaux[i] += ";"
                             for i in range(len(mainList)):
                                 mainListString += mainListaux[i]
-                        print(mainList)
-                        print(mainListaux)
 
                         #########################
-                        print(mainListString)
                         text = mainListString
                         if text.strip() == "": continue
                         result, error = run('<stdin>', text)

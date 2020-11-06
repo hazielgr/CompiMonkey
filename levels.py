@@ -40,9 +40,11 @@ def level1():
     # actores
     pos = random.randint(0, 4)
     monkey_lvl1 = Monkey(randomposx[pos], randomposy[pos], "Monkey")
-    banana2 = Banana(200, 500)
+    banana2 = Banana(200, 400)
+    banan = Banana(500,700)
+    ban = Banana(600,200)
     pad = Pad(200, 300)
-    bananas = [banana2]
+    bananas = [banana2, banan, ban]
     turtles = [pad]
     matches = []
     alligators = []
@@ -65,8 +67,16 @@ def level2():
     # actores
     pos = random.randint(0, 7)
     monkey_lvl2 = Monkey(randomposx[pos], randomposy[pos], "Monkey")
-    banana2 = Banana(300, 100)
-    bananas = [banana2]
+    banana = Banana(300, 300)
+    banan = Banana(100, 100)
+    bana = Banana(0, 400)
+    ban = Banana(700, 0)
+    ba = Banana(100, 600)
+    b = Banana(600, 200)
+    an = Banana(700, 500)
+    ana = Banana(300, 800)
+    banana2 = Banana(500, 700)
+    bananas = [banana2,ana,an,b,ba,ban,bana,banan,banana]
     turtles = []
     matches = []
     alligators = []
@@ -79,7 +89,7 @@ def level2():
 # tortuga y arbustos
 def level3():
     # posiciones random del mono
-    randomposx = [100, 0, 400, 500, 400, 400, 0, 600, 500]
+    randomposx = [100, 0, 0, 500, 0, 0, 0, 600, 500]
     randomposy = [0, 100, 0, 100, 200, 400, 400, 700, 600]
 
     # superficies
@@ -93,8 +103,15 @@ def level3():
     # actores
     pos = random.randint(0, 8)
     monkey_lvl3 = Monkey(randomposx[pos], randomposy[pos], "Monkey")
-    banana1 = Banana(100, 100)
-    bananas = [banana1]
+
+    banana = Banana(200, 0)
+    banan = Banana(700, 100)
+    bana = Banana(300, 400)
+    ban = Banana(700, 400)
+    ba = Banana(700, 600)
+    b = Banana(100, 800)
+    bananas = [b, ba, ban, bana, banan, banana]
+
     turtles = []
     matches = []
     alligators = []
@@ -155,7 +172,7 @@ def level5():
 # cocodrilos
 def level6():
     # posiciones random del mono
-    randomposx = [100, 200, 200, 700, 600, 600, 600]
+    randomposx = [100, 200, 200, 700, 700, 600, 600]
     randomposy = [200, 600, 700, 700, 700, 100, 200]
 
     # superficies
@@ -172,12 +189,20 @@ def level6():
     # actores
     pos = random.randint(0, 6)
     monkey_lvl6 = Monkey(randomposx[pos], randomposy[pos], "Monkey")
-    banana1 = Banana(100, 100)
+
+    banana = Banana(400, 200)
+    banan = Banana(200, 400)
+    bana = Banana(600, 400)
+    ban = Banana(400, 600)
+    bananas = [ban, bana, banan, banana]
+
     cocofunka = Coco(200, 300)
-    bananas = [banana1]
     turtles = []
     matches = []
-    alligators = [cocofunka]
+    cocofunka = Coco(100, 400)
+    cokofunka = Coco(300, 200)
+    cocofunca = Coco(500, 400)
+    alligators = [cocofunka,cokofunka,cocofunca]
     rats = []
     beavers = []
     actors = [monkey_lvl6, bananas, monkey_lvl6.score, turtles, matches, alligators, rats, beavers, river1_lvl6,

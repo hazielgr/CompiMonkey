@@ -37,8 +37,10 @@ class Match:
 class Monkey:
     def __init__(self, posx, posy, sprite):
         self.direction = "up"
+        self.health = 100
         self.id = sprite
         #pa saber si tiene match o no
+        self.mounted = False
         self.holding= False
         if self.id == "Rat":
             self.sprite = rat_sprite
@@ -51,7 +53,6 @@ class Monkey:
         self.move = True
 
     def step(self, num):
-        print(self.move)
         if self.move:
             if self.direction == "up":
                 self.posy -= num*100
@@ -76,6 +77,14 @@ class Monkey:
         elif self.id == "Rat":
             self.sprite = rat_sprite
 
+    def grab(self):
+        self.holding = True
+        #cambiar sprite
+
+    def drop(self):
+        self.holding = False
+        # cambiar sprite
+
 
 class Coco:
     def __init__(self, posx, posy):
@@ -87,7 +96,7 @@ class Coco:
         self.posyC = posy+100
         self.dir = "left"
         self.hitbox = (posx, posy, 300, 100)
-        self.mountable = False
+        self.mounted = False
 
     def rotateCoco (self, monkeX, monkeY):
         if monkeX<self.posxC and monkeY <self.posyC:
@@ -128,7 +137,6 @@ class Coco:
             self.hitbox = (self.posx,self.posy, 100, 300)
             self.sprite = pygame.transform.scale(coco_sprite, (100, 300))
 
-
 class Pad:
     def __init__(self, posx, posy):
         self.sprite = pad_sprite
@@ -138,14 +146,50 @@ class Pad:
         self.hitbox = (posx, posy, 100, 100)
         self.mounted = False
 
-    def movingpad(self):
+    def movingPad(self, num):
         if self.dir == "right":
             if self.posx < 700:
-                self.posx += 100
+                self.posx += num*100
+                self.hitbox = (self.posx, self.posy, 100, 100)
             else:
                 self.dir = "left"
+                self.movingPad(num)
         elif self.dir == "left":
             if self.posx > 99:
-                self.posx -= 100
+                self.posx -= num*100
+                self.hitbox = (self.posx, self.posy, 100, 100)
             else:
                 self.dir = "right"
+                self.movingPad(num)
+
+    def changeDirPad(self,dir):
+        if dir == "right":
+            self.dir = dir
+        elif dir == "left":
+            self.dir = dir
+
+class beaver:
+    def __init__ (self,posx, posy, dir):
+        self.sprite = pad_sprite
+        self.posx = posx
+        self.posy = posy
+        self.dir = dir
+        self.hitbox = (posx, posy, 100, 100)
+        self.mounted = False
+
+    def movingPad(self, num):
+        if self.dir == "right":
+            self.posx += num*100
+            self.hitbox = (self.posx, self.posy, 100, 100)
+        elif self.dir == "left":
+            self.posx -= num*100
+            self.hitbox = (self.posx, self.posy, 100, 100)
+        elif self.dir == "up":
+            self.posy -= num*100
+            self.hitbox = (self.posx, self.posy, 100, 100)
+        elif self.dir == "down":
+            self.posy += num*100
+            self.hitbox = (self.posx, self.posy, 100, 100)
+
+
+
