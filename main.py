@@ -44,6 +44,7 @@ TEXTCOLOR = WHITE
 ##monkeyhead_sprite = pygame.image.load('resources/sprites/monkey_head_icon.png')
 banana_sprite = pygame.image.load('resources/sprites/jungle_banana_icon.png')
 match_sprite = pygame.image.load('resources/sprites/match.png')
+match_sprite = pygame.image.load('resources/sprites/match.png')
 
 buttons = []
 buttonx = 0
@@ -131,8 +132,8 @@ def runGame():
         # level manager
         if currentlvl != changelvl:
             lvlActors = levelManager(changelvl)
-            changeConfigList(lvlActors, displaySurf, currentlvl)
             currentlvl = changelvl
+            changeConfigList(lvlActors, displaySurf, currentlvl)
 
         blitLevel(lvlActors, displaySurf, grid)
 
@@ -155,31 +156,38 @@ def step(num, lvlActors, displaySurf, currentlvl):
     step = 1
     # loop que hace al mono moverse la cantidad de veces indicadas por el usuario
     while contador <= num:
-        if lvlActors[8][2] == "desert":
+        if (currentlvl == 4 or currentlvl == 5):
             pygame.draw.rect(displaySurf, DESERT, (lvlActors[0].posx, lvlActors[0].posy, 99, 99))
         else:
             pygame.draw.rect(displaySurf, GREEN, (lvlActors[0].posx, lvlActors[0].posy, 99, 99))
         # cambia las posiciones posx y posy del mono
         lvlActors[0].step(step)
         # actualiza el hitbox y dibuja el mono en sus nuevas posiciones
+
         lvlActors[0].hitbox = (lvlActors[0].posx, lvlActors[0].posy, 100, 100)
-        displaySurf.blit(lvlActors[0].sprite, (lvlActors[0].posx, lvlActors[0].posy-10))
+        displaySurf.blit(lvlActors[0].sprite, (lvlActors[0].posx, lvlActors[0].posy - 10))
+        if config.lvlActors[0].holding:
+            match_spritex = pygame.transform.scale(match_sprite, (130, 130))
+            displaySurf.blit(match_spritex, (lvlActors[0].posx, lvlActors[0].posy - 10))
         # se cambia el valor del booleano por efectos de colisiones
         lvlActors[0].move = True
         contador += 1
-        pygame.time.wait(200)
+        pygame.time.wait(350)
         checkCollision(lvlActors, currentlvl)
         if lvlActors[0].move == False:
             contador = num
         pygame.display.update()
 
+
 def distanceToX(actor, lvlActors):
     distanceX = abs(lvlActors[0].posx - actor.posx)
-    return int(distanceX/100)
+    return int(distanceX / 100)
+
 
 def distanceToY(actor, lvlActors):
     distanceY = abs(lvlActors[0].posy - actor.posy)
-    return int(distanceY/100)
+    return int(distanceY / 100)
+
 
 def cerca(actor, lvlActors):
     if actor.posx == lvlActors[0].posx and actor.posy == lvlActors[0].posy:
@@ -187,8 +195,10 @@ def cerca(actor, lvlActors):
     else:
         return False
 
+
 def health(lvlActors):
     return lvlActors[0].health
+
 
 ###########
 
@@ -196,13 +206,14 @@ def moveleaf(lvlActors):
     if lvlActors[3][0].mounted:
         lvlActors[0].posx = lvlActors[3][0].posx
 
+
 def changeConfigList(lvlActors, displaySurf, currentelvl):
-    print("largo lista " + str(len(lvlActors)))
     config.lvlActors.clear()
     for i in range(len(lvlActors)):
         config.lvlActors.append(lvlActors[i])
     config.displaySurf = displaySurf
     config.currentlvl = currentlvl
+
 
 # Interpreta el input y cambia el mainList, lineNumber, insertPoint y el cursorRect.
 
@@ -395,7 +406,6 @@ def displayText(mainFont, newChar, typeChar, mainList, deleteKey, returnKey, lin
 
 
 def distanceTo(actor, lvlActors):
-    print(len(lvlActors))
     return math.sqrt(pow((lvlActors[0].posx - actor.posx), 2) + pow((lvlActors[0].posy - actor.posy), 2))
 
 
@@ -417,22 +427,46 @@ def score(displaySurf, lvlActors):
 
 def checkCollision(lvlActors, currentlvl):
     index = 1
-    mapsurface = lvlActors[8:]
+    if currentlvl == 4 or currentlvl == 5:
+        mapsurface = lvlActors[9:]
+    else:
+        mapsurface = lvlActors[8:]
     if len(lvlActors) != 0:
         monkey = lvlActors[0]
 
         if currentlvl == 4 or currentlvl == 5:
             index = 4
 
+        # colisiones bananas y matches
         for item in range(len(config.lvlActors[index])):
+
             if monkey.posy < lvlActors[index][item].hitbox[1] + lvlActors[index][item].hitbox[3] and monkey.posy + \
                     monkey.hitbox[3] > lvlActors[index][item].hitbox[1]:
                 if monkey.posx + monkey.hitbox[2] > lvlActors[index][item].hitbox[0] and monkey.posx < \
                         lvlActors[index][item].hitbox[0] + lvlActors[index][item].hitbox[2]:
-                    lvlActors[2] += 1
-                    config.lvlActors[index].pop(item)
-                    break
+                    if currentlvl == 4 or currentlvl == 5:
+                        if config.lvlActors[0].holding != True:
+                            config.lvlActors[0].holding = True
+                            config.lvlActors[index].pop(item)
 
+                    else:
+                        config.lvlActors[2] += 1
+                        config.lvlActors[index].pop(item)
+
+                    break
+        if currentlvl == 4 or currentlvl == 5:
+            if monkey.posy < lvlActors[-2][0].hitbox[1] + lvlActors[-2][0].hitbox[3] and monkey.posy + \
+                    monkey.hitbox[3] > lvlActors[-2][0].hitbox[1]:
+                if monkey.posx + monkey.hitbox[2] > lvlActors[-2][0].hitbox[0] and monkey.posx < \
+                        lvlActors[-2][0].hitbox[0] + lvlActors[-2][0].hitbox[2]:
+                    if config.lvlActors[0].holding:
+                        x = random.randint(-10, 10)
+                        y = random.randint(-10, 10)
+                        config.lvlActors[-2][1] += 1
+                        config.lvlActors[2] += 1
+                        config.lvlActors[0].holding = False
+
+        # colision con lilypad
         for pad in range(len(lvlActors[3])):
             if monkey.posy < lvlActors[3][pad].hitbox[1] + lvlActors[3][pad].hitbox[3] and monkey.posy + \
                     monkey.hitbox[3] > lvlActors[3][pad].hitbox[1]:
@@ -444,12 +478,12 @@ def checkCollision(lvlActors, currentlvl):
                 lvlActors[3][pad].mounted = False
                 lvlActors[0].mounted = False
 
+        # colision cocodrilo
         for cocodrilo in range(len(lvlActors[5])):
             if monkey.posy < lvlActors[5][cocodrilo].hitbox[1] + lvlActors[5][cocodrilo].hitbox[3] and monkey.posy + \
                     monkey.hitbox[3] > lvlActors[5][cocodrilo].hitbox[1]:
                 if monkey.posx + monkey.hitbox[2] > lvlActors[5][cocodrilo].hitbox[0] and monkey.posx < \
                         lvlActors[5][cocodrilo].hitbox[0] + lvlActors[5][cocodrilo].hitbox[2]:
-
                     lvlActors[5][cocodrilo].mounted = True
                     lvlActors[0].mounted = True
                     break
@@ -457,6 +491,7 @@ def checkCollision(lvlActors, currentlvl):
                 lvlActors[5][cocodrilo].mounted = False
                 lvlActors[0].mounted = False
 
+        # colision rio y bushes
         for i in range(len(mapsurface)):
             if mapsurface[i][2] == "bush":
                 if monkey.posy < mapsurface[i][1][1] + mapsurface[i][1][3] and monkey.posy + \
@@ -465,14 +500,15 @@ def checkCollision(lvlActors, currentlvl):
                             mapsurface[i][1][0] + mapsurface[i][1][2]:
                         monkey.move = False
                         collisionDetected(monkey)
+
             if mapsurface[i][2] == "river":
                 if monkey.posy < mapsurface[i][1][1] + mapsurface[i][1][3] and monkey.posy + \
                         monkey.hitbox[3] > mapsurface[i][1][1]:
                     if monkey.posx + monkey.hitbox[2] > mapsurface[i][1][0] and monkey.posx < \
                             mapsurface[i][1][0] + mapsurface[i][1][2]:
-                        if (lvlActors[0].mounted):
+                        if lvlActors[0].mounted:
                             print("me monte")
-                            if (lvlActors[3]!=[]):
+                            if lvlActors[3] != []:
                                 moveleaf(lvlActors)
                         else:
                             monkey.move = False
@@ -505,7 +541,10 @@ def collisionDetected(monkey):
 def blitLevel(lvlActors, displaySurf, grid):
     if len(lvlActors) != 0:
         # Dibujando la superficie del nivel
-        mapsurface = lvlActors[8:]
+        if currentlvl == 4 or currentlvl == 5:
+            mapsurface = lvlActors[9:]
+        else:
+            mapsurface = lvlActors[8:]
 
         for i in range(len(mapsurface)):
             pygame.draw.rect(displaySurf, mapsurface[i][0], mapsurface[i][1])
@@ -513,27 +552,65 @@ def blitLevel(lvlActors, displaySurf, grid):
         # leaf
         for pad in range(len(lvlActors[3])):
             displaySurf.blit(lvlActors[3][pad].sprite, (lvlActors[3][pad].posx, lvlActors[3][pad].posy))
-            pygame.draw.rect(displaySurf, BLACK, lvlActors[3][pad].hitbox, 2)
+            pygame.draw.rect(displaySurf, BLACK, lvlActors[3][pad].hitbox, 1)
 
         # bananas y sus hitboxes
         for coco in range(len(lvlActors[5])):
             displaySurf.blit(lvlActors[5][coco].sprite, (lvlActors[5][coco].posx, lvlActors[5][coco].posy))
-            pygame.draw.rect(displaySurf, BLACK, lvlActors[5][coco].hitbox, 2)
+            pygame.draw.rect(displaySurf, BLACK, lvlActors[5][coco].hitbox, 1)
 
         for banana in range(len(lvlActors[1])):
             displaySurf.blit(lvlActors[1][banana].sprite, (lvlActors[1][banana].posx, lvlActors[1][banana].posy))
-            pygame.draw.rect(displaySurf, BLACK, lvlActors[1][banana].hitbox, 2)
+            pygame.draw.rect(displaySurf, BLACK, lvlActors[1][banana].hitbox, 1)
 
         for match in range(len(lvlActors[4])):
             displaySurf.blit(lvlActors[4][match].sprite, (lvlActors[4][match].posx, lvlActors[4][match].posy))
-            pygame.draw.rect(displaySurf, BLACK, lvlActors[4][match].hitbox, 2)
+            pygame.draw.rect(displaySurf, BLACK, lvlActors[4][match].hitbox, 1)
+
+        # stack
+        if currentlvl == 4 or currentlvl == 5:
+
+            if lvlActors[-2][1] == 1:
+                displaySurf.blit(lvlActors[-2][0].sprite, (lvlActors[-2][0].posx, lvlActors[-2][0].posy))
+            elif lvlActors[-2][1] == 2:
+                displaySurf.blit(lvlActors[-2][0].sprite, (lvlActors[-2][0].posx, lvlActors[-2][0].posy))
+                displaySurf.blit(lvlActors[-2][0].sprite, (lvlActors[-2][0].posx + 10, lvlActors[-2][0].posy))
+            elif lvlActors[-2][1] == 3:
+                displaySurf.blit(lvlActors[-2][0].sprite, (lvlActors[-2][0].posx, lvlActors[-2][0].posy))
+                displaySurf.blit(lvlActors[-2][0].sprite, (lvlActors[-2][0].posx + 10, lvlActors[-2][0].posy))
+                displaySurf.blit(lvlActors[-2][0].sprite, (lvlActors[-2][0].posx - 10, lvlActors[-2][0].posy))
+            elif lvlActors[-2][1] == 4:
+                displaySurf.blit(lvlActors[-2][0].sprite, (lvlActors[-2][0].posx, lvlActors[-2][0].posy))
+                displaySurf.blit(lvlActors[-2][0].sprite, (lvlActors[-2][0].posx + 10, lvlActors[-2][0].posy))
+                displaySurf.blit(lvlActors[-2][0].sprite, (lvlActors[-2][0].posx - 10, lvlActors[-2][0].posy))
+                displaySurf.blit(lvlActors[-2][0].sprite, (lvlActors[-2][0].posx - 5, lvlActors[-2][0].posy - 10))
+            elif lvlActors[-2][1] == 5:
+                displaySurf.blit(lvlActors[-2][0].sprite, (lvlActors[-2][0].posx, lvlActors[-2][0].posy))
+                displaySurf.blit(lvlActors[-2][0].sprite, (lvlActors[-2][0].posx + 10, lvlActors[-2][0].posy))
+                displaySurf.blit(lvlActors[-2][0].sprite, (lvlActors[-2][0].posx - 10, lvlActors[-2][0].posy))
+                displaySurf.blit(lvlActors[-2][0].sprite, (lvlActors[-2][0].posx - 5, lvlActors[-2][0].posy - 10))
+                displaySurf.blit(lvlActors[-2][0].sprite, (lvlActors[-2][0].posx + 5, lvlActors[-2][0].posy - 10))
+            elif lvlActors[-2][1] == 6:
+                displaySurf.blit(lvlActors[-2][0].sprite, (lvlActors[-2][0].posx, lvlActors[-2][0].posy))
+                displaySurf.blit(lvlActors[-2][0].sprite, (lvlActors[-2][0].posx, lvlActors[-2][0].posy - 20))
+                displaySurf.blit(lvlActors[-2][0].sprite, (lvlActors[-2][0].posx + 10, lvlActors[-2][0].posy))
+                displaySurf.blit(lvlActors[-2][0].sprite, (lvlActors[-2][0].posx - 10, lvlActors[-2][0].posy))
+                displaySurf.blit(lvlActors[-2][0].sprite, (lvlActors[-2][0].posx - 5, lvlActors[-2][0].posy - 10))
+                displaySurf.blit(lvlActors[-2][0].sprite, (lvlActors[-2][0].posx + 5, lvlActors[-2][0].posy - 10))
+
+            lvlActors[-2][0].hitbox = (lvlActors[-2][0].posx + 5, lvlActors[-2][0].posy + 5, 90, 90)
+            pygame.draw.rect(displaySurf, BLACK, lvlActors[-2][0].hitbox, 1)
 
         # monkey y su hitbox
-        displaySurf.blit(lvlActors[0].sprite, (lvlActors[0].posx, lvlActors[0].posy - 10))
-        pygame.draw.rect(displaySurf, BLACK, lvlActors[0].hitbox, 2)
+        if lvlActors[0].id == "Rat":
+            displaySurf.blit(lvlActors[0].sprite, (lvlActors[0].posx, lvlActors[0].posy))
+        else:
+            displaySurf.blit(lvlActors[0].sprite, (lvlActors[0].posx, lvlActors[0].posy - 10))
+        pygame.draw.rect(displaySurf, BLACK, lvlActors[0].hitbox, 1)
         lvlActors[0].hitbox = (lvlActors[0].posx + 0, lvlActors[0].posy, 100, 100)
-
-
+        if config.lvlActors[0].holding:
+            match_spritex = pygame.transform.scale(match_sprite, (100, 100))
+            displaySurf.blit(match_spritex, (lvlActors[0].posx, lvlActors[0].posy - 10))
 
         # grid
         counterx = 0
@@ -616,7 +693,7 @@ def getInput(windowWidth, windowHeight, buttons, changelvl, mainList, lvlActors,
 
         elif event.type == KEYDOWN:
             if event.key == K_BACKSPACE:
-                if (lvlActors[3]!=[]):
+                if (lvlActors[3] != []):
                     lvlActors[3][0].movingPad(1)
                 deleteKey = True
             elif event.key == K_ESCAPE:

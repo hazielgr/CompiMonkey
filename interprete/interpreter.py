@@ -692,7 +692,6 @@ class BuiltInFunction(BaseFunction):
         is_number = isinstance(exec_ctx.symbol_table.get("value"), Number)
         if(is_number):
             main.step(int(str(exec_ctx.symbol_table.get("value"))), config.lvlActors, config.displaySurf, config.currentlvl)
-            print("Monito camina la siguiente cantidad de pasos: " + str(exec_ctx.symbol_table.get("value")))
             return RTResult().success(Number(exec_ctx.symbol_table.get("value")))
         else:
             return RTResult().failure(RTError(self.pos_start, self.pos_end,"El argumento debe ser un numero",exec_ctx))

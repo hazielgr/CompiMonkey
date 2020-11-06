@@ -41,8 +41,8 @@ def level1():
     pos = random.randint(0, 4)
     monkey_lvl1 = Monkey(randomposx[pos], randomposy[pos], "Monkey")
     banana2 = Banana(200, 400)
-    banan = Banana(500,700)
-    ban = Banana(600,200)
+    banan = Banana(500, 700)
+    ban = Banana(600, 200)
     pad = Pad(200, 300)
     bananas = [banana2, banan, ban]
     turtles = [pad]
@@ -76,7 +76,7 @@ def level2():
     an = Banana(700, 500)
     ana = Banana(300, 800)
     banana2 = Banana(500, 700)
-    bananas = [banana2,ana,an,b,ba,ban,bana,banan,banana]
+    bananas = [banana2, ana, an, b, ba, ban, bana, banan, banana]
     turtles = []
     matches = []
     alligators = []
@@ -135,14 +135,20 @@ def level4():
     # actores
     pos = random.randint(0, 7)
     rata_lvl4 = Monkey(randomposx[pos], randomposy[pos], "Rat")
-    match1 = Match(100, 100)
+    match1 = Match(100, 500)
+    match2 = Match(700, 300)
+    match3 = Match(300, 600)
+    match4 = Match(100, 100)
+    match5 = Match(600, 100)
+    match6 = Match(700, 700)
+    stack = Match(300, 300)
     bananas = []
     turtles = []
-    matches = [match1]
+    matches = [match1, match2, match3, match4, match5, match6]
     alligators = []
     rats = []
     beavers = []
-    actors = [rata_lvl4, bananas, rata_lvl4.score, turtles, matches, alligators, rats, beavers, desert]
+    actors = [rata_lvl4, bananas, rata_lvl4.score, turtles, matches, alligators, rats, beavers, [stack, 0, ""], desert]
     return actors
 
 
@@ -159,13 +165,14 @@ def level5():
     pos = random.randint(0, 7)
     rata_lvl5 = Monkey(randomposx[pos], randomposy[pos], "Rat")
     match1 = Match(100, 100)
+    stack = Match(300, 300)
     bananas = []
     turtles = []
     matches = [match1]
     alligators = []
     rats = []
     beavers = []
-    actors = [rata_lvl5, bananas, rata_lvl5.score, turtles, matches, alligators, rats, beavers, desert]
+    actors = [rata_lvl5, bananas, rata_lvl5.score, turtles, matches, alligators, rats, beavers, [stack, 0, ""], desert]
     return actors
 
 
@@ -202,7 +209,7 @@ def level6():
     cocofunka = Coco(100, 400)
     cokofunka = Coco(300, 200)
     cocofunca = Coco(500, 400)
-    alligators = [cocofunka,cokofunka,cocofunca]
+    alligators = [cocofunka, cokofunka, cocofunca]
     rats = []
     beavers = []
     actors = [monkey_lvl6, bananas, monkey_lvl6.score, turtles, matches, alligators, rats, beavers, river1_lvl6,

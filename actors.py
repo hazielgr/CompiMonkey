@@ -4,7 +4,7 @@ import time
 monkeyright_sprite = pygame.image.load('resources/sprites/Mona/MonaDer.png')
 monkeyright_sprite = pygame.transform.scale(monkeyright_sprite, (100, 100))
 rat_sprite = pygame.image.load('resources/sprites/rat.png')
-rat_sprite = pygame.transform.scale(rat_sprite, (100, 100))
+#rat_sprite = pygame.transform.scale(rat_sprite, (100, 100))
 
 banana_sprite = pygame.image.load('resources/sprites/jungle_banana_icon.png')
 pad_sprite = pygame.image.load('resources/sprites/leaf.png')
@@ -32,6 +32,7 @@ class Match:
         self.posx = posx
         self.posy = posy
         self.hitbox = (posx, posy, 100, 100)
+        self.holded = False
 
 
 class Monkey:
