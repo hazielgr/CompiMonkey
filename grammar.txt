@@ -44,7 +44,7 @@ if-expr-c   : KEYWORD:else
               statement
             | (NEWLINE statements KEYWORD:end)
 
-for-expr    : KEYWORD:for IDENTIFIER EQ expr KEYWORD:to expr
+for-expr    : KEYWORD:for IDENTIFIER EQ expr KEYWORD:in expr
               (KEYWORD:step expr)? KEYWORD:then
               statement
             | (NEWLINE statements KEYWORD:end)

@@ -519,10 +519,10 @@ class Parser:
         start_value = res.register(self.expr())
         if res.error: return res
 
-        if not self.current_tok.matches(T_KEYWORD, 'to'):
+        if not self.current_tok.matches(T_KEYWORD, 'in'):
             return res.failure(InvalidSyntaxError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
-                f"Expected 'TO'"
+                f"Expected 'in'"
             ))
 
         res.register_advancement()
@@ -531,7 +531,7 @@ class Parser:
         end_value = res.register(self.expr())
         if res.error: return res
 
-        if self.current_tok.matches(T_KEYWORD, 'step'):
+        if self.current_tok.matches(T_KEYWORD, 'STEP'):
             res.register_advancement()
             self.advance()
 
