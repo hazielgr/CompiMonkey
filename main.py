@@ -481,6 +481,20 @@ def checkCollision(lvlActors, currentlvl):
                 lvlActors[5][cocodrilo].mounted = False
                 lvlActors[0].mounted = False
 
+        # colision beaver
+        for beaver in range(len(lvlActors[7])):
+            if monkey.posy < lvlActors[7][beaver].hitbox[1] + lvlActors[7][beaver].hitbox[
+                3] and monkey.posy + \
+                    monkey.hitbox[3] > lvlActors[7][beaver].hitbox[1]:
+                if monkey.posx + monkey.hitbox[2] > lvlActors[7][beaver].hitbox[0] and monkey.posx < \
+                        lvlActors[7][beaver].hitbox[0] + lvlActors[7][beaver].hitbox[2]:
+                    lvlActors[7][beaver].mounted = True
+                    lvlActors[0].mounted = True
+                    break
+            else:
+                lvlActors[5][beaver].mounted = False
+                lvlActors[0].mounted = False
+
         # colision rio y bushes
         for i in range(len(mapsurface)):
             if mapsurface[i][2] == "bush":
@@ -548,6 +562,10 @@ def blitLevel(lvlActors, displaySurf, grid):
         for coco in range(len(lvlActors[5])):
             displaySurf.blit(lvlActors[5][coco].sprite, (lvlActors[5][coco].posx, lvlActors[5][coco].posy))
             pygame.draw.rect(displaySurf, BLACK, lvlActors[5][coco].hitbox, 1)
+
+        for beaver in range(len(lvlActors[7])):
+            displaySurf.blit(lvlActors[7][beaver].sprite, (lvlActors[7][beaver].posx, lvlActors[7][beaver].posy))
+            pygame.draw.rect(displaySurf, BLACK, lvlActors[7][beaver].hitbox, 1)
 
         for banana in range(len(lvlActors[1])):
             displaySurf.blit(lvlActors[1][banana].sprite, (lvlActors[1][banana].posx, lvlActors[1][banana].posy))
@@ -689,10 +707,10 @@ def getInput(windowWidth, windowHeight, buttons, changelvl, mainList, lvlActors,
             elif event.key == K_ESCAPE:
                 newChar = 'escape'
             elif event.key == K_RETURN:
-                config.lvlActors[0].grab()
                 returnKey = True
             elif event.key == K_TAB:
-                config.lvlActors[0].drop()
+                for item in (lvlActors[5]):
+                    item.turnToC(lvlActors[0])
                 newChar = '    '
                 typeChar = True
             elif event.key == K_LEFT:
