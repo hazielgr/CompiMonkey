@@ -439,14 +439,12 @@ def checkCollision(lvlActors, currentlvl):
 
         # colisiones bananas y matches
         for item in range(len(config.lvlActors[index])):
-
             if monkey.posy < lvlActors[index][item].hitbox[1] + lvlActors[index][item].hitbox[3] and monkey.posy + \
                     monkey.hitbox[3] > lvlActors[index][item].hitbox[1]:
                 if monkey.posx + monkey.hitbox[2] > lvlActors[index][item].hitbox[0] and monkey.posx < \
                         lvlActors[index][item].hitbox[0] + lvlActors[index][item].hitbox[2]:
                     if currentlvl == 4 or currentlvl == 5:
-                        if config.lvlActors[0].holding != True:
-                            config.lvlActors[0].holding = True
+                        if config.lvlActors[0].holding == True:
                             config.lvlActors[index].pop(item)
 
                     else:
@@ -454,17 +452,6 @@ def checkCollision(lvlActors, currentlvl):
                         config.lvlActors[index].pop(item)
 
                     break
-        if currentlvl == 4 or currentlvl == 5:
-            if monkey.posy < lvlActors[-2][0].hitbox[1] + lvlActors[-2][0].hitbox[3] and monkey.posy + \
-                    monkey.hitbox[3] > lvlActors[-2][0].hitbox[1]:
-                if monkey.posx + monkey.hitbox[2] > lvlActors[-2][0].hitbox[0] and monkey.posx < \
-                        lvlActors[-2][0].hitbox[0] + lvlActors[-2][0].hitbox[2]:
-                    if config.lvlActors[0].holding:
-                        x = random.randint(-10, 10)
-                        y = random.randint(-10, 10)
-                        config.lvlActors[-2][1] += 1
-                        config.lvlActors[2] += 1
-                        config.lvlActors[0].holding = False
 
         # colision con lilypad
         for pad in range(len(lvlActors[3])):
@@ -699,8 +686,10 @@ def getInput(windowWidth, windowHeight, buttons, changelvl, mainList, lvlActors,
             elif event.key == K_ESCAPE:
                 newChar = 'escape'
             elif event.key == K_RETURN:
+                config.lvlActors[0].grab()
                 returnKey = True
             elif event.key == K_TAB:
+                config.lvlActors[0].drop()
                 newChar = '    '
                 typeChar = True
             elif event.key == K_LEFT:

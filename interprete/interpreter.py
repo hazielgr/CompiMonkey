@@ -697,7 +697,25 @@ class BuiltInFunction(BaseFunction):
             return RTResult().failure(RTError(self.pos_start, self.pos_end,"El argumento debe ser un numero",exec_ctx))
     execute_step.arg_names = ["value"]
 
-    def execute_turnTo(self, exec_ctx):
+    def execute_grab(self, exec_ctx):
+        is_number = isinstance(exec_ctx.symbol_table.get("value"), Number)
+        if(is_number):
+            main.step(int(str(exec_ctx.symbol_table.get("value"))), config.lvlActors, config.displaySurf, config.currentlvl)
+            return RTResult().success(Number(exec_ctx.symbol_table.get("value")))
+        else:
+            return RTResult().failure(RTError(self.pos_start, self.pos_end,"El argumento debe ser un numero",exec_ctx))
+    execute_grab.arg_names = ["value"]
+
+    def execute_drop(self, exec_ctx):
+        is_number = isinstance(exec_ctx.symbol_table.get("value"), Number)
+        if(is_number):
+            main.step(int(str(exec_ctx.symbol_table.get("value"))), config.lvlActors, config.displaySurf, config.currentlvl)
+            return RTResult().success(Number(exec_ctx.symbol_table.get("value")))
+        else:
+            return RTResult().failure(RTError(self.pos_start, self.pos_end,"El argumento debe ser un numero",exec_ctx))
+    execute_drop.arg_names = ["value"]
+
+    def execute_turn(self, exec_ctx):
         is_string = isinstance(exec_ctx.symbol_table.get("value"), String)
         if(is_string):
             config.lvlActors[0].direction = str(exec_ctx.symbol_table.get("value"))
@@ -705,7 +723,7 @@ class BuiltInFunction(BaseFunction):
             return RTResult().success(Number.true)
         else:
             return RTResult().failure(RTError(self.pos_start, self.pos_end,"El argumento esta incorrecto",exec_ctx))
-    execute_turnTo.arg_names = ["value"]
+    execute_turn.arg_names = ["value"]
 
     def execute_is_list(self, exec_ctx):
         is_number = isinstance(exec_ctx.symbol_table.get("value"), List)
@@ -844,6 +862,8 @@ BuiltInFunction.input = BuiltInFunction("input")
 BuiltInFunction.input_int = BuiltInFunction("input_int")
 BuiltInFunction.clear = BuiltInFunction("clear")
 BuiltInFunction.step = BuiltInFunction("step")
+BuiltInFunction.grab = BuiltInFunction("grab")
+BuiltInFunction.drop = BuiltInFunction("drop")
 BuiltInFunction.turnTo = BuiltInFunction("turnTo")
 BuiltInFunction.turnToX = BuiltInFunction("turnToX")
 BuiltInFunction.turnToY = BuiltInFunction("turnToY")

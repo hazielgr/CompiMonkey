@@ -1,5 +1,6 @@
 import pygame
 import time
+import config
 
 monkeyright_sprite = pygame.image.load('resources/sprites/Mona/MonaDer.png')
 monkeyright_sprite = pygame.transform.scale(monkeyright_sprite, (100, 100))
@@ -79,11 +80,30 @@ class Monkey:
             self.sprite = rat_sprite
 
     def grab(self):
-        self.holding = True
+        lvlActors = config.lvlActors
+        if config.currentlvl == 4 or config.currentlvl == 5:
+            index = 4
+            for item in range(len(config.lvlActors[index])):
+                if self.posy < lvlActors[index][item].hitbox[1] + lvlActors[index][item].hitbox[3] and self.posy + \
+                        self.hitbox[3] > lvlActors[index][item].hitbox[1]:
+                    if self.posx + self.hitbox[2] > lvlActors[index][item].hitbox[0] and self.posx < \
+                            lvlActors[index][item].hitbox[0] + lvlActors[index][item].hitbox[2]:
+                        self.holding = True
+
         #cambiar sprite
 
     def drop(self):
-        self.holding = False
+        lvlActors = config.lvlActors
+        if config.currentlvl == 4 or config.currentlvl == 5:
+            if self.posy < lvlActors[-2][0].hitbox[1] + lvlActors[-2][0].hitbox[3] and self.posy + \
+                    self.hitbox[3] > lvlActors[-2][0].hitbox[1]:
+                if self.posx + self.hitbox[2] > lvlActors[-2][0].hitbox[0] and self.posx < \
+                        lvlActors[-2][0].hitbox[0] + lvlActors[-2][0].hitbox[2]:
+                    if self.holding:
+                        config.lvlActors[-2][1] += 1
+                        config.lvlActors[2] += 1
+                        config.lvlActors[0].holding = False
+
         # cambiar sprite
 
 

@@ -270,9 +270,9 @@ class Parser:
             if res.error: return res
             return res.success(if_expr)
         
-         elif tok.matches(TT_KEYWORD, 'times'): 
-            times_expr = res.register(self.times_expr()) 
-            if res.error: return res 
+        elif tok.matches(TT_KEYWORD, 'times'):
+            times_expr = res.register(self.times_expr())
+            if res.error: return res
             return res.success(times_expr) 
 
         elif tok.matches(TT_KEYWORD, 'FOR'):
