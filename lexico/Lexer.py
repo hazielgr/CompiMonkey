@@ -96,6 +96,7 @@ TT_GTE = 'GTE'
 TT_COMMA = 'COMMA'
 TT_ARROW = 'ARROW'
 TT_NEWLINE = 'NEWLINE'
+TT_PUNTO = 'PUNTO'
 TT_EOF = 'EOF'
 
 KEYWORDS = [
@@ -418,12 +419,14 @@ class UnaryOpNode:
         return f'({self.op_tok}, {self.node})'
     
 class TimesNode:
-    def __init__(self, repetitions_node, sentences_node,should_return_null):
-        self.number_node = repetitions_node
-        self.body_node = sentences_node
+    def __init__(self,end_value_node,body_node, should_return_null):
+
+        self.end_value_node = end_value_node
+
+        self.body_node = body_node
 
         self.should_return_null = should_return_null
-        self.pos_start = self.number_node.pos_start
+        self.pos_start = self.end_value_node.pos_start
         self.pos_end = self.body_node.pos_end
 
 class IfNode:

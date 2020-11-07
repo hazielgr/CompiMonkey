@@ -300,20 +300,21 @@ class Parser:
         if not self.current_tok.matches(TT_KEYWORD, 'times'): 
             return res.failure(InvalidSyntaxError(self.current_tok.pos_start, self.current_tok.pos_end,"Expected 'times' ")) 
         res.register_advancement() 
-        self.advance() 
+        self.advance()
+
         if self.current_tok.type != TT_PUNTO: 
-            return res.failure(InvalidSyntaxError(self.current_tok.pos_start, self.current_tok.pos_end,"Expected '.' ")) 
-        res.register_advancement() 
+            return res.failure(InvalidSyntaxError(self.current_tok.pos_start, self.current_tok.pos_end,"Expected '.' "))
+
+        res.register_advancement()
         self.advance() 
  
-        number = self.current_tok 
-        res.register_advancement() 
-        self.advance() 
- 
-        if self.current_tok.type != TT_ARROW: 
+        end_value = res.register(self.factor())
+
+        if self.current_tok.type != TT_ARROW:
             return res.failure( 
-                InvalidSyntaxError(self.current_tok.pos_start, self.current_tok.pos_end, "Expected '->'")) 
-        res.register_advancement() 
+                InvalidSyntaxError(self.current_tok.pos_start, self.current_tok.pos_end, "Expected '->'"))
+
+        res.register_advancement()
         self.advance() 
  
         if self.current_tok.type != TT_NEWLINE: 
@@ -322,12 +323,12 @@ class Parser:
         res.register_advancement() 
         self.advance() 
  
-        body = res.register(self.expr()) 
+        body = res.register(self.statements())
         if res.error: return res 
         res.register_advancement() 
-        self.advance() 
- 
-        return res.success(TimesNode(number, body,False))
+        self.advance()
+
+        return res.success(TimesNode(end_value, body, False))
 
     def list_expr(self):
         res = ParseResult()

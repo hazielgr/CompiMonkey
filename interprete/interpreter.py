@@ -189,6 +189,40 @@ class Interpreter:
             List(elements).set_context(context).set_pos(node.pos_start, node.pos_end)
         )
 
+    def visit_TimesNode(self, node, context):
+        res = RTResult()
+        elements = []
+        end_value = res.register(self.visit(node.end_value_node, context))
+        if res.should_return(): return res
+
+        step_value = Number(1)
+
+        i = 0
+
+        if step_value.value >= 0:
+            condition = lambda: i < end_value.value
+        else:
+            condition = lambda: i > end_value.value
+
+        while condition():
+            i += step_value.value
+
+            value = res.register(self.visit(node.body_node, context))
+            if res.should_return() and res.loop_should_continue == False and res.loop_should_break == False: return res
+
+            if res.loop_should_continue:
+                continue
+
+            if res.loop_should_break:
+                break
+
+            elements.append(value)
+
+        return res.success(
+            Number.null if node.should_return_null else
+            List(elements).set_context(context).set_pos(node.pos_start, node.pos_end)
+        )
+
     def visit_WhileNode(self, node, context):
         res = RTResult()
         elements = []
