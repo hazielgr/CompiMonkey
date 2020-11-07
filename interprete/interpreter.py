@@ -8,6 +8,8 @@ import main
 import config
 import os
 import math
+
+
 ##########################################################
 # Clase Interpreter: Definicion de funciones que visitan tipos de nodos
 #########################################################
@@ -262,6 +264,7 @@ class Interpreter:
     def visit_BreakNode(self, node, context):
         return RTResult().success_break()
 
+
 ##########################################################
 # Clase Value: Posibles funciones que puede realizar Value
 #########################################################
@@ -337,6 +340,8 @@ class Value:
             'Illegal operation',
             self.context
         )
+
+
 ##########################################################
 # Clase Numero: Posibles funciones que puede realizar numero
 #########################################################
@@ -453,6 +458,8 @@ Number.null = Number(0)
 Number.false = Number(0)
 Number.true = Number(1)
 Number.math_PI = Number(math.pi)
+
+
 ##########################################################
 # Clase String: Posibles funciones que puede realizar String
 #########################################################
@@ -481,11 +488,14 @@ class String(Value):
         copy.set_pos(self.pos_start, self.pos_end)
         copy.set_context(self.context)
         return copy
+
     def __str__(self):
         return self.value
 
     def __repr__(self):
         return f'"{self.value}"'
+
+
 ##########################################################
 # Clase List: Posibles funciones que puede realizar List
 #########################################################
@@ -546,6 +556,8 @@ class List(Value):
 
     def __repr__(self):
         return f'[{", ".join([repr(x) for x in self.elements])}]'
+
+
 class BaseFunction(Value):
     def __init__(self, name):
         super().__init__()
@@ -565,6 +577,8 @@ class BaseFunction(Value):
                 f"{len(args) - len(arg_names)} too many args passed into {self}",
                 self.context
             ))
+
+
 
         if len(args) < len(arg_names):
             return res.failure(RTError(
@@ -690,39 +704,37 @@ class BuiltInFunction(BaseFunction):
 
     def execute_step(self, exec_ctx):
         is_number = isinstance(exec_ctx.symbol_table.get("value"), Number)
-        if(is_number):
-            main.step(int(str(exec_ctx.symbol_table.get("value"))), config.lvlActors, config.displaySurf, config.currentlvl)
+        if (is_number):
+            main.step(int(str(exec_ctx.symbol_table.get("value"))), config.lvlActors, config.displaySurf,
+                      config.currentlvl)
             return RTResult().success(Number(exec_ctx.symbol_table.get("value")))
         else:
-            return RTResult().failure(RTError(self.pos_start, self.pos_end,"El argumento debe ser un numero",exec_ctx))
+            return RTResult().failure(
+                RTError(self.pos_start, self.pos_end, "El argumento debe ser un numero", exec_ctx))
+
     execute_step.arg_names = ["value"]
 
     def execute_grab(self, exec_ctx):
-        is_number = isinstance(exec_ctx.symbol_table.get("value"), Number)
-        if(is_number):
-            main.step(int(str(exec_ctx.symbol_table.get("value"))), config.lvlActors, config.displaySurf, config.currentlvl)
-            return RTResult().success(Number(exec_ctx.symbol_table.get("value")))
-        else:
-            return RTResult().failure(RTError(self.pos_start, self.pos_end,"El argumento debe ser un numero",exec_ctx))
-    execute_grab.arg_names = ["value"]
+        config.lvlActors[0].grab()
+        return RTResult().success(Number.null)
+
+    execute_grab.arg_names = []
 
     def execute_drop(self, exec_ctx):
-        is_number = isinstance(exec_ctx.symbol_table.get("value"), Number)
-        if(is_number):
-            main.step(int(str(exec_ctx.symbol_table.get("value"))), config.lvlActors, config.displaySurf, config.currentlvl)
-            return RTResult().success(Number(exec_ctx.symbol_table.get("value")))
-        else:
-            return RTResult().failure(RTError(self.pos_start, self.pos_end,"El argumento debe ser un numero",exec_ctx))
-    execute_drop.arg_names = ["value"]
+        config.lvlActors[0].drop()
+        return RTResult().success(Number.null)
+
+    execute_drop.arg_names = []
 
     def execute_turn(self, exec_ctx):
         is_string = isinstance(exec_ctx.symbol_table.get("value"), String)
-        if(is_string):
+        if (is_string):
             config.lvlActors[0].direction = str(exec_ctx.symbol_table.get("value"))
-            print(exec_ctx.symbol_table.get("value"))
+
             return RTResult().success(Number.true)
         else:
-            return RTResult().failure(RTError(self.pos_start, self.pos_end,"El argumento esta incorrecto",exec_ctx))
+            return RTResult().failure(RTError(self.pos_start, self.pos_end, "El argumento esta incorrecto", exec_ctx))
+
     execute_turn.arg_names = ["value"]
 
     def execute_is_list(self, exec_ctx):
@@ -856,6 +868,7 @@ class BuiltInFunction(BaseFunction):
 
     execute_run.arg_names = ["fn"]
 
+
 BuiltInFunction.print = BuiltInFunction("print")
 BuiltInFunction.print_ret = BuiltInFunction("print_ret")
 BuiltInFunction.input = BuiltInFunction("input")
@@ -888,6 +901,8 @@ global_symbol_table.set("INPUT_INT", BuiltInFunction.input_int)
 global_symbol_table.set("CLEAR", BuiltInFunction.clear)
 global_symbol_table.set("CLS", BuiltInFunction.clear)
 global_symbol_table.set("step", BuiltInFunction.step)
+global_symbol_table.set("grab", BuiltInFunction.grab)
+global_symbol_table.set("drop", BuiltInFunction.drop)
 global_symbol_table.set("turnTo", BuiltInFunction.turnTo)
 global_symbol_table.set("turnToX", BuiltInFunction.turnToX)
 global_symbol_table.set("turnToY", BuiltInFunction.turnToY)
@@ -901,11 +916,11 @@ global_symbol_table.set("LEN", BuiltInFunction.len)
 global_symbol_table.set("RUN", BuiltInFunction.run)
 
 
-def run(fn,txt):
+def run(fn, txt):
     ##########################################################
     # Analisis de TOkens
     #########################################################
-    lexer = Lexer(fn,txt)
+    lexer = Lexer(fn, txt)
     tokens, error = lexer.make_tokens()
     if error: return None, error
     ##########################################################
@@ -913,12 +928,12 @@ def run(fn,txt):
     #########################################################
     parser = Parser(tokens)
     ast = parser.parse()
-    if ast.error: return None,ast.error
+    if ast.error: return None, ast.error
     ##########################################################
     # Interprete
     #########################################################
     interprete = Interpreter()
     contexto = Context('<programa>')
     contexto.symbol_table = global_symbol_table
-    interpre_sol= interprete.visit(ast.node,contexto)
-    return interpre_sol.value,interpre_sol.error
+    interpre_sol = interprete.visit(ast.node, contexto)
+    return interpre_sol.value, interpre_sol.error

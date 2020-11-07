@@ -135,7 +135,7 @@ def runGame():
             currentlvl = changelvl
             changeConfigList(lvlActors, displaySurf, currentlvl)
 
-        blitLevel(lvlActors, displaySurf, grid)
+        blitLevel(config.lvlActors, displaySurf, grid)
 
         # dibuja los botones
         for i in range(len(buttons)):
@@ -444,8 +444,8 @@ def checkCollision(lvlActors, currentlvl):
                 if monkey.posx + monkey.hitbox[2] > lvlActors[index][item].hitbox[0] and monkey.posx < \
                         lvlActors[index][item].hitbox[0] + lvlActors[index][item].hitbox[2]:
                     if currentlvl == 4 or currentlvl == 5:
-                        if config.lvlActors[0].holding == True:
-                            config.lvlActors[index].pop(item)
+                        if config.lvlActors[0].holding:
+                            print("holding")
 
                     else:
                         config.lvlActors[2] += 1
