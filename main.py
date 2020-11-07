@@ -481,6 +481,20 @@ def checkCollision(lvlActors, currentlvl):
                 lvlActors[5][cocodrilo].mounted = False
                 lvlActors[0].mounted = False
 
+        # colision beaver
+        for beaver in range(len(lvlActors[7])):
+            if monkey.posy < lvlActors[7][beaver].hitbox[1] + lvlActors[7][beaver].hitbox[
+                3] and monkey.posy + \
+                    monkey.hitbox[3] > lvlActors[7][beaver].hitbox[1]:
+                if monkey.posx + monkey.hitbox[2] > lvlActors[7][beaver].hitbox[0] and monkey.posx < \
+                        lvlActors[7][beaver].hitbox[0] + lvlActors[7][beaver].hitbox[2]:
+                    lvlActors[7][beaver].mounted = True
+                    lvlActors[0].mounted = True
+                    break
+            else:
+                lvlActors[5][beaver].mounted = False
+                lvlActors[0].mounted = False
+
         # colision rio y bushes
         for i in range(len(mapsurface)):
             if mapsurface[i][2] == "bush":

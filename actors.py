@@ -209,7 +209,6 @@ class Coco:
         elif self.sprite =="down":
             self.sprite = cocodown_sprite
 
-
     def rotateDir(self):
         if self.dir == "left" or self == "right":
             self.changeSprite()
@@ -262,14 +261,23 @@ class Pad:
 
 class Beaver:
     def __init__(self, posx, posy, dir):
-        self.sprite = beaverdown_sprite
         self.posx = posx
         self.posy = posy
         self.dir = dir
+        self.sprite = beaverup_sprite
+        if self.dir == "down":
+            self.sprite = beaverdown_sprite
+        elif self.dir == "up":
+            self.sprite = beaverdown_sprite
+        elif self.dir == "left":
+            self.sprite = beaverleft_sprite
+        elif self.dir == "right":
+            self.sprite = beaverright_sprite
+
         self.hitbox = (posx, posy, 100, 100)
         self.mounted = False
 
-    def movingPad(self, num):
+    def movingBeaver(self, num):
         if self.dir == "right":
             self.posx += num * 100
             self.hitbox = (self.posx, self.posy, 100, 100)
