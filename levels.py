@@ -206,18 +206,17 @@ def level6():
     ban = Banana(400, 600)
     bananas = [ban, bana, banan, banana]
 
-    cocofunka = Coco(200, 300)
     turtles = []
     matches = []
-    cocofunka = Coco(100, 400)
-    cokofunka = Coco(300, 200)
-    cocofunca = Coco(500, 400)
+    cocofunka = Coco(200, 300,"up")
+    cokofunka = Coco(300, 200,"left")
+    cocofunca = Coco(600, 300,"down")
     alligators = [cocofunka, cokofunka, cocofunca]
     rats = []
 
-    beaveronetime = Beaver(300,800,"Up")
-    beavertwotimes = Beaver(400, 800, "Up")
-    beaverBOMBOCLAT = Beaver(500, 800, "Up")
+    beaveronetime = Beaver(300,800,"up")
+    beavertwotimes = Beaver(400, 800, "up")
+    beaverBOMBOCLAT = Beaver(500, 800, "up")
     beavers = [beaveronetime,beavertwotimes,beaverBOMBOCLAT]
     actors = [monkey_lvl6, bananas, monkey_lvl6.score, turtles, matches, alligators, rats, beavers, river1_lvl6,
               river2_lvl6, river3_lvl6, river4_lvl6, river5_lvl6, island1, island2,

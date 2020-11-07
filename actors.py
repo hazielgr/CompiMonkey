@@ -39,8 +39,6 @@ match_sprite = pygame.transform.scale(match_sprite, (100, 100))
 monkeyright_sprite = pygame.image.load('resources/sprites/Mona/MonaDer.png')
 monkeyright_sprite = pygame.transform.scale(monkeyright_sprite, (100, 100))
 
-
-
 class Banana:
 
     def __init__(self, posx, posy):
@@ -48,7 +46,6 @@ class Banana:
         self.posx = posx
         self.posy = posy
         self.hitbox = (posx, posy, 100, 100)
-
 
 class Match:
 
@@ -59,7 +56,6 @@ class Match:
         self.hitbox = (posx, posy, 100, 100)
         self.holded = False
 
-
 class Monkey:
     def __init__(self, posx, posy, sprite):
         self.direction = "up"
@@ -67,6 +63,7 @@ class Monkey:
         self.id = sprite
         # pa saber si tiene match o no
         self.mounted = False
+        self.mountedTwo = False
         self.holding = False
         if self.id == "Rat":
             self.sprite = rat_sprite
@@ -142,7 +139,7 @@ class Monkey:
         # cambiar sprite
 
 class Coco:
-    def __init__(self, posx, posy):
+    def __init__(self, posx, posy,dir):
         self.sprite = coco_sprite
         self.posx = posx
         self.posy = posy
@@ -151,81 +148,15 @@ class Coco:
         self.posyC = posy + 100
         self.dir = "left"
         self.hitbox = (posx, posy, 300, 100)
-        self.mounted = False
-
-    def rotateCoco(self, monkeX, monkeY):
-        if monkeX < self.posxC and monkeY < self.posyC:
-            # mono arriba a la izq
-            if self != "up":
-                self.dir = "up"
-                self.rotateDir()
-
-        elif monkeX > self.posxC and monkeY < self.posyC:
-            # mono arriba a la der
-            if self != "up":
-                self.dir = "up"
-                self.rotateDir()
-        elif monkeX == self.posxC and monkeY < self.posyC:
-            # mono arriba
-            if self != "up":
-                self.dir = "up"
-                self.rotateDir()
-        elif monkeX < self.posxC and monkeY == self.posyC:
-            # mono a la izq
-            if self != "left":
-                self.dir = "left"
-                self.rotateDir()
-        elif monkeX > self.posxC and monkeY == self.posyC:
-            # mono a la der
-            if self != "right":
-                self.dir = "right"
-                self.rotateDir()
-        elif monkeX < self.posxC and monkeY > self.posyC:
-            # mono abajo a la izq
-            if self != "down":
-                self.dir = "down"
-                self.rotateDir()
-        elif monkeX > self.posxC and monkeY > self.posyC:
-            # mono abajo a la der
-            if self != "down":
-                self.dir = "down"
-                self.rotateDir()
-        elif monkeX == self.posxC and monkeY > self.posyC:
-            # mono abajo
-            if self != "down":
-                self.dir = "down"
-                self.rotateDir()
-        else:
-            # mono en el centro del mop
-            self.dir = self.dir
-
-    def changeSprite(self):
-        if self.dir == "left":
-            self.sprite = coco_sprite
-        elif self.dir == "right":
-            self.sprite = cocoright_sprite
-        elif self.dir == "up":
-            self.sprite = cocoup_sprite
-        elif self.sprite =="down":
+        if dir == "down":
             self.sprite = cocodown_sprite
-
-    def rotateDir(self):
-        if self.dir == "left" or self == "right":
-            self.changeSprite()
-            self.posx -= 100
-            self.posy += 100
-            self.hitbox = (self.posx, self.posy, 300, 100)
-        elif self.dir == "up" or self.dir == "down":
-            self.changeSprite()
-            self.posx += 100
-            self.posy -= 100
-            self.hitbox = (self.posx, self.posy, 100, 300)
-
-
-    def turnToC (self, monkey):
-        self.rotateCoco(monkey.posx, monkey.posy)
-
-
+            self.dir = "down"
+            self.hitbox = (posx, posy, 100, 300)
+        elif dir == "up":
+            self.sprite = cocoup_sprite
+            self.dir = "up"
+            self.hitbox = (posx, posy, 100, 300)
+        self.mounted = False
 
 class Pad:
     def __init__(self, posx, posy):
@@ -252,12 +183,16 @@ class Pad:
                 self.dir = "right"
                 self.movingPad(num)
 
+    def movePadAux(self,num):
+        while (num>0):
+            self.movingPad(1)
+            num -=1
+
     def changeDirPad(self, dir):
         if dir == "right":
             self.dir = dir
         elif dir == "left":
             self.dir = dir
-
 
 class Beaver:
     def __init__(self, posx, posy, dir):

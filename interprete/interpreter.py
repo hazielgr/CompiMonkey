@@ -736,6 +736,44 @@ class BuiltInFunction(BaseFunction):
 
     execute_clear.arg_names = []
 
+    def execute_movePad (self, exec_ctx):
+        is_number = isinstance(exec_ctx.symbol_table.get("value"), Number)
+        if (is_number):
+            for item in range(len(config.lvlActors[3])):
+                config.lvlActors[3][item].movePadAux(int(str(exec_ctx.symbol_table.get("value"))))
+            return RTResult().success(Number(exec_ctx.symbol_table.get("value")))
+        else:
+            return RTResult().failure(
+                RTError(self.pos_start, self.pos_end, "Los argumento deben ser una lista de dos numeros", exec_ctx))
+
+    execute_movePad.arg_names = ["value"]
+
+
+    def execute_changeDirPad (self, exec_ctx):
+        is_string = isinstance(exec_ctx.symbol_table.get("value"), String)
+        if (is_string):
+            for item in range(len(config.lvlActors[3])):
+                config.lvlActors[3][item].changeDirPad(str(exec_ctx.symbol_table.get("value")))
+            return RTResult().success(Number(exec_ctx.symbol_table.get("value")))
+        else:
+            return RTResult().failure(
+                RTError(self.pos_start, self.pos_end, "Los argumento deben ser una lista de dos numeros", exec_ctx))
+
+    execute_changeDirPad.arg_names = ["value"]
+
+
+    def execute_movingBeaver (self, exec_ctx):
+        is_number = isinstance(exec_ctx.symbol_table.get("value"), Number)
+        if (is_number):
+            for item in range(len(config.lvlActors[7])):
+                config.lvlActors[7][item].movingBeaver(int(str(exec_ctx.symbol_table.get("value"))))
+            return RTResult().success(Number(exec_ctx.symbol_table.get("value")))
+        else:
+            return RTResult().failure(
+                RTError(self.pos_start, self.pos_end, "Los argumento deben ser una lista de dos numeros", exec_ctx))
+
+    execute_movingBeaver.arg_names = ["value"]
+
     def execute_step(self, exec_ctx):
         is_number = isinstance(exec_ctx.symbol_table.get("value"), Number)
         if (is_number):
@@ -763,7 +801,7 @@ class BuiltInFunction(BaseFunction):
     def execute_turn(self, exec_ctx):
         is_string = isinstance(exec_ctx.symbol_table.get("value"), String)
         if (is_string):
-            config.lvlActors[0].direction = str(exec_ctx.symbol_table.get("value"))
+            config.lvlActors[0].turn(str(exec_ctx.symbol_table.get("value")))
 
             return RTResult().success(Number.true)
         else:
@@ -922,6 +960,9 @@ BuiltInFunction.pop = BuiltInFunction("pop")
 BuiltInFunction.extend = BuiltInFunction("extend")
 BuiltInFunction.len = BuiltInFunction("len")
 BuiltInFunction.run = BuiltInFunction("run")
+BuiltInFunction.movePad = BuiltInFunction("movePad")
+BuiltInFunction.changeDirPad = BuiltInFunction("changeDirPad")
+BuiltInFunction.movingBeaver = BuiltInFunction("movingBeaver")
 
 global_symbol_table = SymbolTable()
 global_symbol_table.set("NULL", Number.null)
@@ -948,6 +989,9 @@ global_symbol_table.set("POP", BuiltInFunction.pop)
 global_symbol_table.set("EXTEND", BuiltInFunction.extend)
 global_symbol_table.set("LEN", BuiltInFunction.len)
 global_symbol_table.set("RUN", BuiltInFunction.run)
+global_symbol_table.set("movePad", BuiltInFunction.movePad)
+global_symbol_table.set("changeDirPad", BuiltInFunction.changeDirPad)
+global_symbol_table.set("movingBeaver", BuiltInFunction.movingBeaver)
 
 
 def run(fn, txt):

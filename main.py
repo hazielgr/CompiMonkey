@@ -469,16 +469,17 @@ def checkCollision(lvlActors, currentlvl):
                 lvlActors[0].mounted = False
 
         # colision cocodrilo
-        for cocodrilo in range(len(lvlActors[5])):
-            if monkey.posy < lvlActors[5][cocodrilo].hitbox[1] + lvlActors[5][cocodrilo].hitbox[3] and monkey.posy + \
-                    monkey.hitbox[3] > lvlActors[5][cocodrilo].hitbox[1]:
-                if monkey.posx + monkey.hitbox[2] > lvlActors[5][cocodrilo].hitbox[0] and monkey.posx < \
-                        lvlActors[5][cocodrilo].hitbox[0] + lvlActors[5][cocodrilo].hitbox[2]:
-                    lvlActors[5][cocodrilo].mounted = True
+        for coco in range(len(lvlActors[5])):
+            if monkey.posy < lvlActors[5][coco].hitbox[1] + lvlActors[5][coco].hitbox[
+                3] and monkey.posy + \
+                    monkey.hitbox[3] > lvlActors[5][coco].hitbox[1]:
+                if monkey.posx + monkey.hitbox[2] > lvlActors[5][coco].hitbox[0] and monkey.posx < \
+                        lvlActors[5][coco].hitbox[0] + lvlActors[5][coco].hitbox[2]:
+                    lvlActors[5][coco].mounted = True
                     lvlActors[0].mounted = True
                     break
             else:
-                lvlActors[5][cocodrilo].mounted = False
+                lvlActors[5][coco].mounted = False
                 lvlActors[0].mounted = False
 
         # colision beaver
@@ -489,11 +490,11 @@ def checkCollision(lvlActors, currentlvl):
                 if monkey.posx + monkey.hitbox[2] > lvlActors[7][beaver].hitbox[0] and monkey.posx < \
                         lvlActors[7][beaver].hitbox[0] + lvlActors[7][beaver].hitbox[2]:
                     lvlActors[7][beaver].mounted = True
-                    lvlActors[0].mounted = True
+                    lvlActors[0].mountedTwo = True
                     break
             else:
-                lvlActors[5][beaver].mounted = False
-                lvlActors[0].mounted = False
+                lvlActors[7][beaver].mounted = False
+                lvlActors[0].mountedTwo = False
 
         # colision rio y bushes
         for i in range(len(mapsurface)):
@@ -510,7 +511,8 @@ def checkCollision(lvlActors, currentlvl):
                         monkey.hitbox[3] > mapsurface[i][1][1]:
                     if monkey.posx + monkey.hitbox[2] > mapsurface[i][1][0] and monkey.posx < \
                             mapsurface[i][1][0] + mapsurface[i][1][2]:
-                        if lvlActors[0].mounted:
+                        print(lvlActors[0].mounted)
+                        if lvlActors[0].mounted or lvlActors[0].mountedTwo :
                             print("me monte")
                             if lvlActors[3] != []:
                                 moveleaf(lvlActors)
@@ -611,7 +613,7 @@ def blitLevel(lvlActors, displaySurf, grid):
 
         # monkey y su hitbox
         if lvlActors[0].id == "Rat":
-            displaySurf.blit(lvlActors[0].sprite, (lvlActors[0].posx, lvlActors[0].posy))
+            displaySurf.blit(config.lvlActors[0].sprite, (lvlActors[0].posx, lvlActors[0].posy))
         else:
             displaySurf.blit(lvlActors[0].sprite, (lvlActors[0].posx, lvlActors[0].posy - 10))
         pygame.draw.rect(displaySurf, BLACK, lvlActors[0].hitbox, 1)
@@ -701,16 +703,12 @@ def getInput(windowWidth, windowHeight, buttons, changelvl, mainList, lvlActors,
 
         elif event.type == KEYDOWN:
             if event.key == K_BACKSPACE:
-                if (lvlActors[3] != []):
-                    lvlActors[3][0].movingPad(1)
                 deleteKey = True
             elif event.key == K_ESCAPE:
                 newChar = 'escape'
             elif event.key == K_RETURN:
                 returnKey = True
             elif event.key == K_TAB:
-                for item in (lvlActors[5]):
-                    item.turnToC(lvlActors[0])
                 newChar = '    '
                 typeChar = True
             elif event.key == K_LEFT:
