@@ -33,42 +33,6 @@ class Position:
     def copy(self):
         return Position(self.idx, self.ln, self.col, self.fn, self.ftxt)
 ##########################################################
-# Constantes Tokens: Creamos los tokens
-#########################################################
-'''
-T_ENTERO       =       'ENTERO'
-T_STRING       =       'STRING'
-T_DECIMAL      =       'DECIMAL'
-T_SUMA         =       'SUMA'
-T_MENOS        =       'MENOS'
-T_MULTIPLICA   =       'MULTIPLICA'
-T_DIVIDE       =       'DIVIDE'
-T_PARENTIZQ    =       'PARENTIZQ'
-T_PARENTDER    =       'PARENTDER'
-T_RECTIZQ      =       'RECTIZQ'
-T_RECTDER      =       'RECTDER'
-T_EOF          =       'EOF'
-T_IDENTIFICADOR=       'IDENTIFICADOR'
-T_IGUAL        =       'EQ'
-T_KEYWORD      =       'KEYWORD'
-T_POW		   =       'POW'
-T_COMP_IGUAL   =       'COMP_EQUAL'
-T_COMP_NO_IGUAL=       'COMP_NOT_EQUAL'
-T_COMP_MENORQUE=       'COMP_MENORQUE'
-T_COMP_MAYORQUE=       'COMP_MAYORQUE'
-T_COMP_MENORIGUAL=     'COMP_MENORIGUAL'
-T_COMP_MAYORIGUAL=     'COMP_MAYORIGUAL'
-T_NEWLINE	   =       'NEWLINE'
-T_COMA         =       'COMA'
-T_FLECHA	   =       'FLECHA'
-T_PUNTO        =       'PUNTO'
-T_TAB          =       'TAB'
-
-KEYWORDS = [
-    'and' , 'or' , 'not', 'if', 'else','times','for','in','until','return'
-]
-'''
-##########################################################
 # Clase Token: Base para crear los tokens
 #########################################################
 
@@ -271,7 +235,6 @@ class Lexer:
     def make_identifier(self):
         id_str = ''
         pos_start = self.pos.copy()
-
         while self.current_char != None and self.current_char in LETTERS_DIGITS + '_':
             id_str += self.current_char
             self.advance()
@@ -336,7 +299,6 @@ class Lexer:
 
     def skip_comment(self):
         self.advance()
-
         while self.current_char != '\n':
             self.advance()
 
@@ -346,28 +308,22 @@ class Lexer:
 #######################################
 # NODES
 #######################################
-
 class NumberNode:
     def __init__(self, tok):
         self.tok = tok
-
         self.pos_start = self.tok.pos_start
         self.pos_end = self.tok.pos_end
 
     def __repr__(self):
         return f'{self.tok}'
-
 
 class StringNode:
     def __init__(self, tok):
         self.tok = tok
-
         self.pos_start = self.tok.pos_start
         self.pos_end = self.tok.pos_end
-
     def __repr__(self):
         return f'{self.tok}'
-
 
 class ListNode:
     def __init__(self, element_nodes, pos_start, pos_end):
@@ -376,14 +332,12 @@ class ListNode:
         self.pos_start = pos_start
         self.pos_end = pos_end
 
-
 class VarAccessNode:
     def __init__(self, var_name_tok):
         self.var_name_tok = var_name_tok
 
         self.pos_start = self.var_name_tok.pos_start
         self.pos_end = self.var_name_tok.pos_end
-
 
 class VarAssignNode:
     def __init__(self, var_name_tok, value_node):
@@ -405,7 +359,6 @@ class BinOpNode:
 
     def __repr__(self):
         return f'({self.left_node}, {self.op_tok}, {self.right_node})'
-
 
 class UnaryOpNode:
     def __init__(self, op_tok, node):
@@ -437,7 +390,6 @@ class IfNode:
         self.pos_start = self.cases[0][0].pos_start
         self.pos_end = (self.else_case or self.cases[len(self.cases) - 1])[0].pos_end
 
-
 class ForNode:
     def __init__(self, var_name_tok, start_value_node, end_value_node, step_value_node, body_node, should_return_null):
         self.var_name_tok = var_name_tok
@@ -450,7 +402,6 @@ class ForNode:
         self.pos_start = self.var_name_tok.pos_start
         self.pos_end = self.body_node.pos_end
 
-
 class WhileNode:
     def __init__(self, condition_node, body_node, should_return_null):
         self.condition_node = condition_node
@@ -459,7 +410,6 @@ class WhileNode:
 
         self.pos_start = self.condition_node.pos_start
         self.pos_end = self.body_node.pos_end
-
 
 class FuncDefNode:
     def __init__(self, var_name_tok, arg_name_toks, body_node, should_auto_return):
@@ -477,7 +427,6 @@ class FuncDefNode:
 
         self.pos_end = self.body_node.pos_end
 
-
 class CallNode:
     def __init__(self, node_to_call, arg_nodes):
         self.node_to_call = node_to_call
@@ -490,7 +439,6 @@ class CallNode:
         else:
             self.pos_end = self.node_to_call.pos_end
 
-
 class ReturnNode:
     def __init__(self, node_to_return, pos_start, pos_end):
         self.node_to_return = node_to_return
@@ -498,12 +446,10 @@ class ReturnNode:
         self.pos_start = pos_start
         self.pos_end = pos_end
 
-
 class ContinueNode:
     def __init__(self, pos_start, pos_end):
         self.pos_start = pos_start
         self.pos_end = pos_end
-
 
 class BreakNode:
     def __init__(self, pos_start, pos_end):

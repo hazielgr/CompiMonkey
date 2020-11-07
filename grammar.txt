@@ -1,37 +1,60 @@
-statements      : NEWLINE* expr (NEWLINE+ expr)* NEWLINE*
+statements  : NEWLINE* statement (NEWLINE+ statement)* NEWLINE*
 
-expr            : TAB IDENTIFICADOR EQ expr
-				: comp_expr ((KEYWORD:AND|KEYWORD:OR) comp_expr)*
+statement	: KEYWORD:RETURN expr?
+					: KEYWORD:CONTINUE
+					: KEYWORD:BREAK
+					: expr
 
-comp_expr		: NOT comp_expr
-				: arith_expr ((COMP_EQUAL|COMP_MENORQUE|COMP_MAYORQUE|COMP_MENORIGUAL|COMP_MAYORIGUAL) arith_expr)*
+expr        : KEYWORD:VAR IDENTIFIER EQ expr
+            : comp-expr ((KEYWORD:AND|KEYWORD:OR) comp-expr)*
 
-arith-expr	    : term ((SUMA|RESTA) term)*
+comp-expr   : NOT comp-expr
+            : arith-expr ((EE|LT|GT|LTE|GTE) arith-expr)*
 
-term            : factor ((MULTIPLICA|DIVIDE) factor)*
+arith-expr  : term ((PLUS|MINUS) term)*
 
-factor	        : (SUMA|RESTA) factor
-				: power
+term        : factor ((MUL|DIV) factor)*
 
-power		    : call (POW factor)*
+factor      : (PLUS|MINUS) factor
+            : power
 
-call            : atom (LPAREN (expr (COMMA expr)*)? RPAREN)?
+power       : call (POW factor)*
 
-atom 		    : ENTERO|DECIMAL|IDENTIFICADOR
-				: PARENTIZQ expr PARENTDER
-				: if-expr
+call        : atom (LPAREN (expr (COMMA expr)*)? RPAREN)?
 
-list-expr       : RECIZQ (expr (COMA expr)*)? RECTDER
+atom        : INT|FLOAT|STRING|IDENTIFIER
+            : LPAREN expr RPAREN
+            : list-expr
+            : if-expr
+            : for-expr
+            : while-expr
+            : func-def
 
-if-expr         : KEYWORD:if expr
-                  (NEWLINE expr)
-                  KEYWORD:else
-                  (NEWLINE expr)
+list-expr   : LSQUARE (expr (COMMA expr)*)? RSQUARE
 
-for-expr    : KEYWORD:FOR IDENTIFIER EQ expr KEYWORD:in expr
-              (NEWLINE statements)
+if-expr     : KEYWORD:IF expr KEYWORD:THEN
+              (statement if-expr-b|if-expr-c?)
+            | (NEWLINE statements KEYWORD:END|if-expr-b|if-expr-c)
 
-until-expr  : KEYWORD:until expr
-              (NEWLINE statements)
+if-expr-b   : KEYWORD:ELIF expr KEYWORD:THEN
+              (statement if-expr-b|if-expr-c?)
+            | (NEWLINE statements KEYWORD:END|if-expr-b|if-expr-c)
 
+if-expr-c   : KEYWORD:ELSE
+              statement
+            | (NEWLINE statements KEYWORD:END)
+
+for-expr    : KEYWORD:FOR IDENTIFIER EQ expr KEYWORD:TO expr
+              (KEYWORD:STEP expr)? KEYWORD:THEN
+              statement
+            | (NEWLINE statements KEYWORD:END)
+
+while-expr  : KEYWORD:WHILE expr KEYWORD:THEN
+              statement
+            | (NEWLINE statements KEYWORD:END)
+
+func-def    : KEYWORD:def IDENTIFIER?
+              LPAREN (IDENTIFIER (COMMA IDENTIFIER)*)? RPAREN
+              (ARROW expr)
+            | (NEWLINE statements KEYWORD:END)
 
