@@ -165,7 +165,10 @@ def step(num, lvlActors, displaySurf, currentlvl):
         # actualiza el hitbox y dibuja el mono en sus nuevas posiciones
 
         lvlActors[0].hitbox = (lvlActors[0].posx, lvlActors[0].posy, 100, 100)
-        displaySurf.blit(lvlActors[0].sprite, (lvlActors[0].posx, lvlActors[0].posy - 10))
+        if (currentlvl == 4 or currentlvl == 5):
+            displaySurf.blit(lvlActors[0].sprite, (lvlActors[0].posx, lvlActors[0].posy))
+        else:
+            displaySurf.blit(lvlActors[0].sprite, (lvlActors[0].posx, lvlActors[0].posy - 10))
         if config.lvlActors[0].holding:
             match_spritex = pygame.transform.scale(match_sprite, (130, 130))
             displaySurf.blit(match_spritex, (lvlActors[0].posx, lvlActors[0].posy - 10))
