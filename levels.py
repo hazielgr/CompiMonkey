@@ -77,6 +77,7 @@ def level2():
     ana = Banana(300, 800)
     banana2 = Banana(500, 700)
     bananas = [banana2, ana, an, b, ba, ban, bana, banan, banana]
+
     turtles = []
     matches = []
     alligators = []
@@ -112,7 +113,9 @@ def level3():
     b = Banana(100, 800)
     bananas = [b, ba, ban, bana, banan, banana]
 
-    turtles = []
+    padONETIME = Pad(100, 300)
+    padBOMBOCLAT = Pad(600, 500)
+    turtles = [padONETIME,padBOMBOCLAT]
     matches = []
     alligators = []
     rats = []
@@ -211,7 +214,11 @@ def level6():
     cocofunca = Coco(500, 400)
     alligators = [cocofunka, cokofunka, cocofunca]
     rats = []
-    beavers = []
+
+    beaveronetime = Beaver(300,800,"Up")
+    beavertwotimes = Beaver(400, 800, "Up")
+    beaverBOMBOCLAT = Beaver(500, 800, "Up")
+    beavers = [beaveronetime,beavertwotimes,beaverBOMBOCLAT]
     actors = [monkey_lvl6, bananas, monkey_lvl6.score, turtles, matches, alligators, rats, beavers, river1_lvl6,
               river2_lvl6, river3_lvl6, river4_lvl6, river5_lvl6, island1, island2,
               island3, island4]

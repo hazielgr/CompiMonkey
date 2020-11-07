@@ -549,6 +549,10 @@ def blitLevel(lvlActors, displaySurf, grid):
             displaySurf.blit(lvlActors[5][coco].sprite, (lvlActors[5][coco].posx, lvlActors[5][coco].posy))
             pygame.draw.rect(displaySurf, BLACK, lvlActors[5][coco].hitbox, 1)
 
+        for beaver in range(len(lvlActors[7])):
+            displaySurf.blit(lvlActors[7][beaver].sprite, (lvlActors[7][beaver].posx, lvlActors[7][beaver].posy))
+            pygame.draw.rect(displaySurf, BLACK, lvlActors[7][beaver].hitbox, 1)
+
         for banana in range(len(lvlActors[1])):
             displaySurf.blit(lvlActors[1][banana].sprite, (lvlActors[1][banana].posx, lvlActors[1][banana].posy))
             pygame.draw.rect(displaySurf, BLACK, lvlActors[1][banana].hitbox, 1)
@@ -689,10 +693,10 @@ def getInput(windowWidth, windowHeight, buttons, changelvl, mainList, lvlActors,
             elif event.key == K_ESCAPE:
                 newChar = 'escape'
             elif event.key == K_RETURN:
-                config.lvlActors[0].grab()
                 returnKey = True
             elif event.key == K_TAB:
-                config.lvlActors[0].drop()
+                for item in (lvlActors[5]):
+                    item.turnToC(lvlActors[0])
                 newChar = '    '
                 typeChar = True
             elif event.key == K_LEFT:

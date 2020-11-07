@@ -6,9 +6,8 @@ import string
 MINUSCULA = string.ascii_lowercase
 LETTERS = string.ascii_letters
 DIGITS = '0123456789'
-SPECIAL = '@ $ ?'
-LETRAS_SPECIALES = LETTERS + SPECIAL
-LETTERS_DIGITS = LETTERS + DIGITS
+SPECIAL = '@ $ ? ( )'
+LETTERS_DIGITS = LETTERS + DIGITS + SPECIAL
 ##########################################################
 # Clase Position: lleva registro de cual charac lee
 #########################################################
@@ -133,7 +132,7 @@ class Lexer:
                 self.advance()
             elif self.current_char in DIGITS:
                 tokens.append(self.make_number())
-            elif self.current_char in LETTERS:
+            elif self.current_char in MINUSCULA:
                 tokens.append(self.make_identifier())
             elif self.current_char == '"':
                 tokens.append(self.make_string())

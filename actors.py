@@ -5,8 +5,31 @@ import config
 
 monkeyright_sprite = pygame.image.load('resources/sprites/Mona/MonaDer.png')
 monkeyright_sprite = pygame.transform.scale(monkeyright_sprite, (100, 100))
-rat_sprite = pygame.image.load('resources/sprites/rat.png')
-# rat_sprite = pygame.transform.scale(rat_sprite, (100, 100))
+monkeyleft_sprite = pygame.image.load('resources/sprites/Mona/MonaLeft.png')
+monkeyleft_sprite = pygame.transform.scale(monkeyleft_sprite, (100, 100))
+monkeydown_sprite = pygame.image.load('resources/sprites/Mona/Mona.png')
+monkeydown_sprite = pygame.transform.scale(monkeydown_sprite, (100, 100))
+monkeyup_sprite = pygame.image.load('resources/sprites/Mona/MonaUp.png')
+monkeyup_sprite = pygame.transform.scale(monkeyup_sprite, (100, 100))
+
+rat_sprite = pygame.image.load('resources/sprites/rat/rat.png')
+ratleft_sprite = pygame.image.load('resources/sprites/rat/ratLeft.png')
+ratright_sprite = pygame.image.load('resources/sprites/rat/ratDer.png')
+ratup_sprite = pygame.image.load('resources/sprites/rat/ratUp.png')
+
+coco_sprite = pygame.image.load('resources/sprites/coco/cocoL.png')
+coco_sprite = pygame.transform.scale(coco_sprite, (300, 100))
+cocoright_sprite = pygame.image.load('resources/sprites/coco/cocoR.png')
+cocoright_sprite = pygame.transform.scale(cocoright_sprite, (300, 100))
+cocoup_sprite = pygame.image.load('resources/sprites/coco/cocoU.png')
+cocoup_sprite = pygame.transform.scale(cocoup_sprite, (100, 300))
+cocodown_sprite = pygame.image.load('resources/sprites/coco/cocoD.png')
+cocodown_sprite = pygame.transform.scale(cocodown_sprite, (100, 300))
+
+beaverup_sprite = pygame.image.load("resources/sprites/beaver/beaverU.png")
+beaverdown_sprite = pygame.image.load("resources/sprites/beaver/beaverD.png")
+beaverleft_sprite = pygame.image.load("resources/sprites/beaver/beaverL.png")
+beaverright_sprite = pygame.image.load("resources/sprites/beaver/beaverR.png")
 
 banana_sprite = pygame.image.load('resources/sprites/jungle_banana_icon.png')
 pad_sprite = pygame.image.load('resources/sprites/leaf.png')
@@ -15,8 +38,7 @@ match_sprite = pygame.image.load('resources/sprites/match.png')
 match_sprite = pygame.transform.scale(match_sprite, (100, 100))
 monkeyright_sprite = pygame.image.load('resources/sprites/Mona/MonaDer.png')
 monkeyright_sprite = pygame.transform.scale(monkeyright_sprite, (100, 100))
-coco_sprite = pygame.image.load('resources/sprites/coco/cocoL.png')
-coco_sprite = pygame.transform.scale(coco_sprite, (300, 100))
+
 
 
 class Banana:
@@ -73,13 +95,20 @@ class Monkey:
             if direction == "right":
                 self.sprite = monkeyright_sprite
             elif direction == "left":
-                self.sprite = monkeyright_sprite
+                self.sprite = monkeyleft_sprite
             elif direction == "up":
-                self.sprite = monkeyright_sprite
+                self.sprite = monkeyup_sprite
             elif direction == "down":
-                self.sprite = monkeyright_sprite
+                self.sprite = monkeydown_sprite
         elif self.id == "Rat":
-            self.sprite = rat_sprite
+            if direction == "right":
+                self.sprite = ratright_sprite
+            elif direction == "left":
+                self.sprite = ratleft_sprite
+            elif direction == "up":
+                self.sprite = ratup_sprite
+            elif direction == "down":
+                self.sprite = rat_sprite
 
     def grab(self):
         lvlActors = config.lvlActors
@@ -112,7 +141,6 @@ class Monkey:
 
         # cambiar sprite
 
-
 class Coco:
     def __init__(self, posx, posy):
         self.sprite = coco_sprite
@@ -128,42 +156,76 @@ class Coco:
     def rotateCoco(self, monkeX, monkeY):
         if monkeX < self.posxC and monkeY < self.posyC:
             # mono arriba a la izq
-            self.dir = "up"
+            if self != "up":
+                self.dir = "up"
+                self.rotateDir()
+
         elif monkeX > self.posxC and monkeY < self.posyC:
             # mono arriba a la der
-            self.dir = "up"
+            if self != "up":
+                self.dir = "up"
+                self.rotateDir()
         elif monkeX == self.posxC and monkeY < self.posyC:
             # mono arriba
-            self.dir = "up"
+            if self != "up":
+                self.dir = "up"
+                self.rotateDir()
         elif monkeX < self.posxC and monkeY == self.posyC:
             # mono a la izq
-            self.dir = "left"
+            if self != "left":
+                self.dir = "left"
+                self.rotateDir()
         elif monkeX > self.posxC and monkeY == self.posyC:
             # mono a la der
-            self.dir = "right"
+            if self != "right":
+                self.dir = "right"
+                self.rotateDir()
         elif monkeX < self.posxC and monkeY > self.posyC:
             # mono abajo a la izq
-            self.dir = "down"
+            if self != "down":
+                self.dir = "down"
+                self.rotateDir()
         elif monkeX > self.posxC and monkeY > self.posyC:
             # mono abajo a la der
-            self.dir = "down"
+            if self != "down":
+                self.dir = "down"
+                self.rotateDir()
         elif monkeX == self.posxC and monkeY > self.posyC:
             # mono abajo
-            self.dir = "down"
+            if self != "down":
+                self.dir = "down"
+                self.rotateDir()
         else:
             # mono en el centro del mop
             self.dir = self.dir
 
+    def changeSprite(self):
+        if self.dir == "left":
+            self.sprite = coco_sprite
+        elif self.dir == "right":
+            self.sprite = cocoright_sprite
+        elif self.dir == "up":
+            self.sprite = cocoup_sprite
+        elif self.sprite =="down":
+            self.sprite = cocodown_sprite
+
+
     def rotateDir(self):
         if self.dir == "left" or self == "right":
+            self.changeSprite()
             self.posx -= 100
             self.posy += 100
             self.hitbox = (self.posx, self.posy, 300, 100)
         elif self.dir == "up" or self.dir == "down":
+            self.changeSprite()
             self.posx += 100
             self.posy -= 100
             self.hitbox = (self.posx, self.posy, 100, 300)
-            self.sprite = pygame.transform.scale(coco_sprite, (100, 300))
+
+
+    def turnToC (self, monkey):
+        self.rotateCoco(monkey.posx, monkey.posy)
+
 
 
 class Pad:
@@ -198,9 +260,9 @@ class Pad:
             self.dir = dir
 
 
-class beaver:
+class Beaver:
     def __init__(self, posx, posy, dir):
-        self.sprite = pad_sprite
+        self.sprite = beaverdown_sprite
         self.posx = posx
         self.posy = posy
         self.dir = dir
