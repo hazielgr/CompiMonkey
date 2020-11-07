@@ -32,93 +32,56 @@ class Position:
 
     def copy(self):
         return Position(self.idx, self.ln, self.col, self.fn, self.ftxt)
-##########################################################
-# Constantes Tokens: Creamos los tokens
-#########################################################
-'''
-T_ENTERO       =       'ENTERO'
-T_STRING       =       'STRING'
-T_DECIMAL      =       'DECIMAL'
-T_SUMA         =       'SUMA'
-T_MENOS        =       'MENOS'
-T_MULTIPLICA   =       'MULTIPLICA'
-T_DIVIDE       =       'DIVIDE'
-T_PARENTIZQ    =       'PARENTIZQ'
-T_PARENTDER    =       'PARENTDER'
-T_RECTIZQ      =       'RECTIZQ'
-T_RECTDER      =       'RECTDER'
-T_EOF          =       'EOF'
-T_IDENTIFICADOR=       'IDENTIFICADOR'
-T_IGUAL        =       'EQ'
-T_KEYWORD      =       'KEYWORD'
-T_POW		   =       'POW'
-T_COMP_IGUAL   =       'COMP_EQUAL'
-T_COMP_NO_IGUAL=       'COMP_NOT_EQUAL'
-T_COMP_MENORQUE=       'COMP_MENORQUE'
-T_COMP_MAYORQUE=       'COMP_MAYORQUE'
-T_COMP_MENORIGUAL=     'COMP_MENORIGUAL'
-T_COMP_MAYORIGUAL=     'COMP_MAYORIGUAL'
-T_NEWLINE	   =       'NEWLINE'
-T_COMA         =       'COMA'
-T_FLECHA	   =       'FLECHA'
-T_PUNTO        =       'PUNTO'
-T_TAB          =       'TAB'
 
-KEYWORDS = [
-    'and' , 'or' , 'not', 'if', 'else','times','for','in','until','return'
-]
-'''
-##########################################################
-# Clase Token: Base para crear los tokens
-#########################################################
-
-TT_INT = 'INT'
-TT_FLOAT = 'FLOAT'
-TT_STRING = 'STRING'
-TT_IDENTIFIER = 'IDENTIFIER'
-TT_KEYWORD = 'KEYWORD'
-TT_PLUS = 'PLUS'
-TT_MINUS = 'MINUS'
-TT_MUL = 'MUL'
-TT_DIV = 'DIV'
-TT_POW = 'POW'
-TT_EQ = 'EQ'
-TT_LPAREN = 'LPAREN'
-TT_RPAREN = 'RPAREN'
-TT_LSQUARE = 'LSQUARE'
-TT_RSQUARE = 'RSQUARE'
-TT_EE = 'EE'
-TT_NE = 'NE'
-TT_LT = 'LT'
-TT_GT = 'GT'
-TT_LTE = 'LTE'
-TT_GTE = 'GTE'
-TT_COMMA = 'COMMA'
-TT_ARROW = 'ARROW'
-TT_NEWLINE = 'NEWLINE'
-TT_EOF = 'EOF'
+T_INT = 'INT'
+T_FLOAT = 'FLOAT'
+T_STRING = 'STRING'
+T_IDENTIFIER = 'IDENTIFIER'
+T_KEYWORD = 'KEYWORD'
+T_PLUS = 'PLUS'
+T_MINUS = 'MINUS'
+T_MUL = 'MUL'
+T_DIV = 'DIV'
+T_POW = 'POW'
+T_EQ = 'EQ'
+T_LPAREN = 'LPAREN'
+T_RPAREN = 'RPAREN'
+T_LSQUARE = 'LSQUARE'
+T_RSQUARE = 'RSQUARE'
+T_EE = 'EE'
+T_NE = 'NE'
+T_LT = 'LT'
+T_GT = 'GT'
+T_LTE = 'LTE'
+T_GTE = 'GTE'
+T_COMMA = 'COMMA'
+T_ARROW = 'ARROW'
+T_NEWLINE = 'NEWLINE'
+T_EOF = 'EOF'
 
 KEYWORDS = [
     'var',
-    'AND',
-    'OR',
-    'NOT',
-    'IF',
-    'ELIF',
-    'ELSE',
-    'FOR',
-    'TO',
-    'STEP',
-    'WHILE',
+    'and',
+    'or',
+    'not',
+    'if',
+    'elif',
+    'else',
+    'for',
+    'to',
+    'step',
+    'until',
     'def',
-    'THEN',
-    'END',
-    'RETURN',
-    'CONTINUE',
-    'BREAK',
+    'then',
+    'end',
+    'return',
+    'continue',
+    'break',
     'times'
 ]
-
+##########################################################
+# Clase Token: Base para crear los tokens
+#########################################################
 
 class Token:
     def __init__(self, type_, value=None, pos_start=None, pos_end=None):
@@ -166,7 +129,7 @@ class Lexer:
             elif self.current_char == '#':
                 self.skip_comment()
             elif self.current_char in ';\n':
-                tokens.append(Token(TT_NEWLINE, pos_start=self.pos))
+                tokens.append(Token(T_NEWLINE, pos_start=self.pos))
                 self.advance()
             elif self.current_char in DIGITS:
                 tokens.append(self.make_number())
@@ -175,30 +138,30 @@ class Lexer:
             elif self.current_char == '"':
                 tokens.append(self.make_string())
             elif self.current_char == '+':
-                tokens.append(Token(TT_PLUS, pos_start=self.pos))
+                tokens.append(Token(T_PLUS, pos_start=self.pos))
                 self.advance()
             elif self.current_char == '-':
                 tokens.append(self.make_minus_or_arrow())
             elif self.current_char == '*':
-                tokens.append(Token(TT_MUL, pos_start=self.pos))
+                tokens.append(Token(T_MUL, pos_start=self.pos))
                 self.advance()
             elif self.current_char == '/':
-                tokens.append(Token(TT_DIV, pos_start=self.pos))
+                tokens.append(Token(T_DIV, pos_start=self.pos))
                 self.advance()
             elif self.current_char == '^':
-                tokens.append(Token(TT_POW, pos_start=self.pos))
+                tokens.append(Token(T_POW, pos_start=self.pos))
                 self.advance()
             elif self.current_char == '(':
-                tokens.append(Token(TT_LPAREN, pos_start=self.pos))
+                tokens.append(Token(T_LPAREN, pos_start=self.pos))
                 self.advance()
             elif self.current_char == ')':
-                tokens.append(Token(TT_RPAREN, pos_start=self.pos))
+                tokens.append(Token(T_RPAREN, pos_start=self.pos))
                 self.advance()
             elif self.current_char == '[':
-                tokens.append(Token(TT_LSQUARE, pos_start=self.pos))
+                tokens.append(Token(T_LSQUARE, pos_start=self.pos))
                 self.advance()
             elif self.current_char == ']':
-                tokens.append(Token(TT_RSQUARE, pos_start=self.pos))
+                tokens.append(Token(T_RSQUARE, pos_start=self.pos))
                 self.advance()
             elif self.current_char == '!':
                 token, error = self.make_not_equals()
@@ -211,10 +174,10 @@ class Lexer:
             elif self.current_char == '>':
                 tokens.append(self.make_greater_than())
             elif self.current_char == ',':
-                tokens.append(Token(TT_COMMA, pos_start=self.pos))
+                tokens.append(Token(T_COMMA, pos_start=self.pos))
                 self.advance()
             elif self.current_char == '.':
-                tokens.append(Token(TT_PUNTO, pos_start=self.pos))
+                tokens.append(Token(T_PUNTO, pos_start=self.pos))
                 self.advance()
             else:
                 pos_start = self.pos.copy()
@@ -222,7 +185,7 @@ class Lexer:
                 self.advance()
                 return [], IllegalCharError(pos_start, self.pos, "'" + char + "'")
 
-        tokens.append(Token(TT_EOF, pos_start=self.pos))
+        tokens.append(Token(T_EOF, pos_start=self.pos))
         return tokens, None
 
     def make_number(self):
@@ -238,9 +201,9 @@ class Lexer:
             self.advance()
 
         if dot_count == 0:
-            return Token(TT_INT, int(num_str), pos_start, self.pos)
+            return Token(T_INT, int(num_str), pos_start, self.pos)
         else:
-            return Token(TT_FLOAT, float(num_str), pos_start, self.pos)
+            return Token(T_FLOAT, float(num_str), pos_start, self.pos)
 
     def make_string(self):
         string = ''
@@ -265,7 +228,7 @@ class Lexer:
             escape_character = False
 
         self.advance()
-        return Token(TT_STRING, string, pos_start, self.pos)
+        return Token(T_STRING, string, pos_start, self.pos)
 
     def make_identifier(self):
         id_str = ''
@@ -275,17 +238,17 @@ class Lexer:
             id_str += self.current_char
             self.advance()
 
-        tok_type = TT_KEYWORD if id_str in KEYWORDS else TT_IDENTIFIER
+        tok_type = T_KEYWORD if id_str in KEYWORDS else T_IDENTIFIER
         return Token(tok_type, id_str, pos_start, self.pos)
 
     def make_minus_or_arrow(self):
-        tok_type = TT_MINUS
+        tok_type = T_MINUS
         pos_start = self.pos.copy()
         self.advance()
 
         if self.current_char == '>':
             self.advance()
-            tok_type = TT_ARROW
+            tok_type = T_ARROW
 
         return Token(tok_type, pos_start=pos_start, pos_end=self.pos)
 
@@ -295,53 +258,49 @@ class Lexer:
 
         if self.current_char == '=':
             self.advance()
-            return Token(TT_NE, pos_start=pos_start, pos_end=self.pos), None
+            return Token(T_NE, pos_start=pos_start, pos_end=self.pos), None
 
         self.advance()
         return None, ExpectedCharError(pos_start, self.pos, "'=' (after '!')")
 
     def make_equals(self):
-        tok_type = TT_EQ
+        tok_type = T_EQ
         pos_start = self.pos.copy()
         self.advance()
 
         if self.current_char == '=':
             self.advance()
-            tok_type = TT_EE
+            tok_type = T_EE
 
         return Token(tok_type, pos_start=pos_start, pos_end=self.pos)
 
     def make_less_than(self):
-        tok_type = TT_LT
+        tok_type = T_LT
         pos_start = self.pos.copy()
         self.advance()
 
         if self.current_char == '=':
             self.advance()
-            tok_type = TT_LTE
+            tok_type = T_LTE
 
         return Token(tok_type, pos_start=pos_start, pos_end=self.pos)
 
     def make_greater_than(self):
-        tok_type = TT_GT
+        tok_type = T_GT
         pos_start = self.pos.copy()
         self.advance()
 
         if self.current_char == '=':
             self.advance()
-            tok_type = TT_GTE
+            tok_type = T_GTE
 
         return Token(tok_type, pos_start=pos_start, pos_end=self.pos)
 
     def skip_comment(self):
         self.advance()
-
         while self.current_char != '\n':
             self.advance()
-
         self.advance()
-
-
 #######################################
 # NODES
 #######################################
@@ -367,14 +326,12 @@ class StringNode:
     def __repr__(self):
         return f'{self.tok}'
 
-
 class ListNode:
     def __init__(self, element_nodes, pos_start, pos_end):
         self.element_nodes = element_nodes
 
         self.pos_start = pos_start
         self.pos_end = pos_end
-
 
 class VarAccessNode:
     def __init__(self, var_name_tok):
@@ -383,7 +340,6 @@ class VarAccessNode:
         self.pos_start = self.var_name_tok.pos_start
         self.pos_end = self.var_name_tok.pos_end
 
-
 class VarAssignNode:
     def __init__(self, var_name_tok, value_node):
         self.var_name_tok = var_name_tok
@@ -391,7 +347,6 @@ class VarAssignNode:
 
         self.pos_start = self.var_name_tok.pos_start
         self.pos_end = self.value_node.pos_end
-
 
 class BinOpNode:
     def __init__(self, left_node, op_tok, right_node):
@@ -404,7 +359,6 @@ class BinOpNode:
 
     def __repr__(self):
         return f'({self.left_node}, {self.op_tok}, {self.right_node})'
-
 
 class UnaryOpNode:
     def __init__(self, op_tok, node):
@@ -448,7 +402,7 @@ class ForNode:
         self.pos_end = self.body_node.pos_end
 
 
-class WhileNode:
+class UntilNode:
     def __init__(self, condition_node, body_node, should_return_null):
         self.condition_node = condition_node
         self.body_node = body_node
